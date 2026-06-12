@@ -189,6 +189,13 @@ export default function App() {
     return advice.slice(0, 4); // return max 4 top targeted items
   }, [formData, calculatedBMI]);
 
+  // Filter contributions by active factor tab (risk vs protective)
+  const filteredContributions = useMemo(() => {
+    const items = analysisResult.contributions.filter((f) => f.type === factorTab);
+    const maxC = Math.max(...analysisResult.contributions.map((x) => Math.abs(x.contribution)), 0.01);
+    return { items, maxC };
+  }, [analysisResult, factorTab]);
+
   return (
     <div className="relative w-full max-w-5xl mx-auto z-10 px-4 py-12">
       {/* Decorative architectural background lines */}
@@ -911,20 +918,13 @@ export default function App() {
 
                     {/* Filtered features contribution scrollable box */}
                     <div className="factors-list custom-scrollbar max-h-68 overflow-y-auto flex flex-col gap-3 pr-2 mb-6">
-                      {useMemo(() => {
-                        const items = analysisResult.contributions.filter((f) => f.type === factorTab);
-                        if (items.length === 0) {
-                          return (
-                            <p className="text-xs text-neutral-400 italic text-center py-6">
-                              Bu kategoride belirleyici bir faktör saptanmadı.
-                            </p>
-                          );
-                        }
-
-                        const maxC = Math.max(...analysisResult.contributions.map((x) => Math.abs(x.contribution)), 0.01);
-
-                        return items.map((f) => {
-                          const percentageWidth = Math.min((Math.abs(f.contribution) / maxC) * 100, 100);
+                      {filteredContributions.items.length === 0 ? (
+                        <p className="text-xs text-neutral-400 italic text-center py-6">
+                          Bu kategoride belirleyici bir faktör saptanmadı.
+                        </p>
+                      ) : (
+                        filteredContributions.items.map((f) => {
+                          const percentageWidth = Math.min((Math.abs(f.contribution) / filteredContributions.maxC) * 100, 100);
 
                           let labelText = '';
                           if (f.feature === 'BMI') labelText = `${f.value} kg/m²`;
@@ -965,8 +965,8 @@ export default function App() {
                               <p className="factor-desc text-[10px] text-neutral-500 leading-normal">{f.desc}</p>
                             </div>
                           );
-                        });
-                      }, [analysisResult, factorTab])}
+                        })
+                      )}
                     </div>
 
                     {/* Recommended Medical & Lifestyle actions list box */}
