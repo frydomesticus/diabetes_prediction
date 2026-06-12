@@ -8,24 +8,24 @@ export const TRANSLATIONS = {
     logoTitle: 'Equilibrium',
     logoSub: 'Diyabet Risk Analizi • IE410 Advanced Computer Programming',
     navPredict: 'Risk Hesaplayıcı',
-    navDashboard: 'Model Dashboard',
+    navDashboard: 'Model Gösterge Paneli',
     
     // Steps
     step1Label: 'Demografi',
-    step1Title: 'Demografik & Sosyal Bilgiler',
+    step1Title: 'Demografik ve Sosyal Bilgiler',
     step1Desc: 'Lütfen yaş grubu, biyolojik cinsiyete bağlı değişkenler ve eğitim/gelir düzeylerinizi belirtin.',
     
     step2Label: 'Vücut & Sağlık',
-    step2Title: 'Vücut Ölçüleri & Genel Sağlık',
-    step2Desc: 'Biyolojik kütlenizi ve kişisel sağlık durumunuzu belirleyin.',
+    step2Title: 'Vücut Ölçüleri ve Genel Sağlık',
+    step2Desc: 'Biyolojik ölçümlerinizi ve kişisel sağlık durumunuzu belirleyin.',
     
     step3Label: 'Geçmiş',
-    step3Title: 'Klinik & Tıbbi Öykü',
+    step3Title: 'Klinik ve Tıbbi Öykü',
     step3Desc: 'Lütfen resmi tıp kuruluşlarınca konmuş tanı veya vasküler durumlarınızı belirtin.',
     
     step4Label: 'Yaşam Tarzı',
-    step4Title: 'Yaşam Tarzı & Alışkanlıklar',
-    step4Desc: 'Günlük rasyon, egzersiz döngünüz ve temel sağlık sistemi ilişkileriniz.',
+    step4Title: 'Yaşam Tarzı ve Alışkanlıklar',
+    step4Desc: 'Günlük beslenme, egzersiz alışkanlıklarınız ve sağlık sistemiyle olan ilişkileriniz.',
     
     // Buttons
     btnPrev: 'Geri',
@@ -47,99 +47,99 @@ export const TRANSLATIONS = {
     labelWeight: 'Kilo',
     labelBMI: 'Vücut Kitle İndeksi (BMI)',
     labelGenHlth: 'Genel Sağlık Değerlendirmeniz',
-    descGenHlth: 'Genel sağlık durumunuzu nasıl nitelendirirsiniz (1 En İyi - 5 En Kötü)?',
+    descGenHlth: 'Genel sağlık durumunuzu nasıl nitelendirirsiniz (1 Mükemmel - 5 Kötü)?',
     genHlthExcellent: 'Mükemmel',
     genHlthVeryGood: 'Çok İyi',
     genHlthGood: 'İyi',
     genHlthFair: 'Orta',
     genHlthPoor: 'Kötü',
     labelMentHlth: 'Ruh Sağlığı Şikayeti',
-    descMentHlth: 'Son 30 günün kaç gününde stres, depresyon veya ruhsal düşüş yaşadınız?',
+    descMentHlth: 'Son 30 günde kaç gün stres, depresyon veya ruhsal açıdan kötü hissettiniz?',
     labelPhysHlth: 'Fiziksel Sağlık Şikayeti',
-    descPhysHlth: 'Son 30 günün kaç gününde hastalık, ağrı veya bedensel yaralanma yaşadınız?',
+    descPhysHlth: 'Son 30 günde kaç gün hastalık, ağrı veya bedensel yaralanma yaşadınız?',
     unitDays: 'Gün',
     
     // Results
     resultHeader: 'Hesaplama Özeti',
-    gaugeTitle: 'Eğilim Analiz Göstergesi',
+    gaugeTitle: 'Diyabet Risk Göstergesi',
     gaugeLabel: 'Risk Olasılığı',
     riskLow: 'Düşük Risk',
     riskMedium: 'Orta Risk',
     riskHigh: 'Yüksek Risk',
-    explanationLow: 'Biyometrik modelleriniz, diyabet risk profilinizi güvenli / düşük seviyede görmektedir. Mevcut sağlıklı döngünüzü koruyun.',
-    explanationMedium: 'Modelimiz, diyabet eşiğinizi orta dereceli risk grubunda görmektedir. Tıbbi ve metabolik dinamiklerinizde optimize edilebilecek alanlar bulunuyor.',
-    explanationHigh: 'Dikkat: Algoritma profili, yüksek diyabet yatkınlığı tespit etti. Glisemik dengenizi netleştirmek üzere bir uzman hekim kontrolü talep edebilirsiniz.',
+    explanationLow: 'Biyometrik verileriniz, diyabet risk profilinizin düşük seviyede olduğunu göstermektedir. Mevcut sağlıklı yaşam tarzınızı korumanızı öneririz.',
+    explanationMedium: 'Eldeki veriler, diyabet riskinizin orta düzeyde olduğunu göstermektedir. Yaşam tarzınızda ve metabolik değerlerinizde iyileştirilebilecek alanlar bulunmaktadır.',
+    explanationHigh: 'Dikkat: Analiz sonuçları yüksek diyabet riski göstermektedir. Detaylı kontroller ve kesin tanı için en kısa sürede bir uzman hekime başvurmanızı öneririz.',
     
     // Contributions Tab
-    contributionsTitle: 'Bireysel Karar Özellikleri',
-    contributionsSub: 'Özniteliklerin risk katsayılarına göre bireysel ağırlık dağılımı',
+    contributionsTitle: 'Kişisel Risk Faktörleri Analizi',
+    contributionsSub: 'Özelliklerin risk katsayılarına göre bireysel ağırlık dağılımı',
     tabRisk: 'Risk Artıranlar',
     tabProtective: 'Koruyucu Faktörler',
     noFactors: 'Bu kategoride belirleyici bir faktör saptanmadı.',
-    posCorr: 'Pozitif Korelasyon',
-    negCorr: 'Negatif Korelasyon',
+    posCorr: 'Riski Artıran Faktör',
+    negCorr: 'Riski Azaltan (Koruyucu) Faktör',
     
     // Recommendations
-    recTitle: 'Klinik Yaşam Tarzı Tavsiyeleri',
-    recHighBP: '<strong>Tansiyon Kontrolü:</strong> Teşhis edilmiş yüksek tansiyonunuz bulunuyor. Sodyum tüketiminizi kısıtlayıp ilaçlarınızı hekim tavsiyesine göre aksatmamak diyabet riskini ciddi oranda düşürür.',
-    recHighChol: '<strong>Kolesterol Yönetimi:</strong> Yüksek kolesterol insülin direncini ve vasküler riskleri tetikler. Endüstriyel trans yağlardan kaçınmalı ve lifli yulaf, bakliyat diyetine ağırlık vermelisiniz.',
-    recObese: '<strong>Bilinçli Kilo Yönetimi:</strong> BMI değeriniz obezite aralığında. Toplam vücut kütlenizde yapacağınız yalnızca %5 ila %8 hafifleme dahi insülin duyarlılığınızı geri kazanmanıza muazzam yardım eder.',
-    recOverweight: '<strong>Kilo Dengeleme:</strong> BMI değeriniz hafif kilolu sınırında seyrediyor. Karbonhidrat porsiyon kontrolü uygulayarak kilonuzun ilerlemesini sınırlandırmanız akılcı bir koruma tedbiridir.',
-    recNoPhys: '<strong>Aktif Yaşama Geçiş:</strong> Son 30 günde düzenli egzersiz yapmadığınızı belirttiniz. Haftada 150 dakika orta tempolu yürüyüş veya bisiklet sürmek, kasların glukoz kullanımını uyararak şekeri dengeler.',
-    recSmoker: '<strong>Sigara Tedavisi:</strong> Nikotin hücresel düzeyde insülin reseptör hasarı ile diyabet riskini pekiştirir. Sigara bırakma programlarına katılarak bu majör risk odağını eleyebilirsiniz.',
-    recNoDiet: '<strong>Beslenme Optimizasyonu:</strong> Günlük taze sebze ve meyve tüketiminiz düşük seviyede. Lifli gıda ve antioksidanlar bağırsak mikrobiyotasını onararak glisemik dalgalanmaları önler.',
-    recAcademicNote: '<strong>Akademik Bilgi Notu:</strong> Bu sistem tıbbi bir danışmanlık alternatifi değildir. Riskiniz yüksek çıksın veya çıkmasın, kesin tanı ve erken teşhis için mutlaka hekim gözetiminde kan ölçüm testi (HbA1c) yaptırınız.',
+    recTitle: 'Yaşam Tarzı ve Sağlık Önerileri',
+    recHighBP: '<strong>Tansiyon Kontrolü:</strong> Yüksek tansiyonunuz bulunmaktadır. Tuz tüketimini sınırlandırmak ve hekiminizin önerdiği tedaviyi aksatmamak diyabet riskini azaltmaya yardımcı olur.',
+    recHighChol: '<strong>Kolesterol Yönetimi:</strong> Yüksek kolesterol, insülin direncini ve damar sağlığı risklerini tetikler. Doymuş yağ tüketimini azaltmalı; lifli gıdalar, yulaf ve baklagiller tüketmeye özen göstermelisiniz.',
+    recObese: '<strong>Kilo Yönetimi:</strong> Vücut kitle indeksiniz obezite aralığındadır. Vücut ağırlığınızda sağlayacağınız %5 ila %8 oranında bir azalma bile insülin duyarlılığınızı önemli ölçüde artıracaktır.',
+    recOverweight: '<strong>Kilo Kontrolü:</strong> Vücut kitle indeksiniz fazla kilolu aralığındadır. Beslenmenizde porsiyon kontrolü uygulayarak kilonuzu dengede tutmanız önemli bir koruyucu önlemdir.',
+    recNoPhys: '<strong>Fiziksel Aktivite:</strong> Düzenli fiziksel aktivite yapmadığınızı belirttiniz. Haftalık en az 150 dakika orta tempolu egzersiz (yürüyüş, bisiklet vb.) kaslarınızın glukoz kullanımını artırarak kan şekerini düzenler.',
+    recSmoker: '<strong>Sigarayı Bırakma:</strong> Nikotin, hücre düzeyinde insülin reseptörlerine zarar vererek diyabet riskini artırır. Sigarayı bırakarak bu önemli risk faktörünü ortadan kaldırabilirsiniz.',
+    recNoDiet: '<strong>Sebze ve Meyve Tüketimi:</strong> Günlük sebze ve meyve tüketiminizin düşük olduğunu belirttiniz. Lif ve antioksidan yönünden zengin beslenmek sindirim sistemini destekler ve kan şekeri dalgalanmalarını önler.',
+    recAcademicNote: '<strong>Akademik Bilgi Notu:</strong> Bu platform tıbbi bir teşhis veya tedavi önerisi niteliği taşımamaktadır. Kesin tanı ve değerlendirme için lütfen uzman bir hekime başvurarak kan tetkiklerinizi (HbA1c vb.) yaptırınız.',
     
     // Dashboard
     dashHeader: 'Metrikler',
-    dashTitle: 'Akademik Model Raporu',
-    dashSub: 'IE410 Advanced Computer Programming kapsamında CDC BRFSS veri kümesiyle eğitilen en dengeli Lojistik Regresyon',
-    dashModelStrategy: 'Sınıf kütle ağırlıkları dengelenmiş parametrik olasılık modeli',
-    dashParamsHeader: 'Analiz Parametreleri & Bilgileri',
-    dashParamSize: '<strong>Model Boyutu:</strong> CDC BRFSS 2015 Anket kümesi (253.680 onaylı veri kaydı)',
-    dashParamWeight: '<strong>Uyum Yaklaşımı:</strong> Popülasyon dengesizliği optimizasyonu için class_weight="balanced" entegrasyonu.',
-    dashParamSplit: '<strong>Segmentasyon Oranı:</strong> %80 Eğitim (202.944 satır), %20 Test (50.736 satır)',
-    dashParamValidation: '<strong>Doğrulama Metodu:</strong> Stratified 5-Fold grid arama modeliyle hiperparametre seçimi.',
+    dashTitle: 'Model Performans Raporu',
+    dashSub: 'IE410 Advanced Computer Programming dersi kapsamında CDC BRFSS veri kümesiyle eğitilen Lojistik Regresyon modeli',
+    dashModelStrategy: 'Sınıf ağırlıkları dengelenmiş (balanced) parametrik olasılık modeli',
+    dashParamsHeader: 'Model Eğitim Parametreleri',
+    dashParamSize: '<strong>Veri Seti Boyutu:</strong> CDC BRFSS 2015 anket verileri (253.680 adet kayıt)',
+    dashParamWeight: '<strong>Sınıf Dengeleme:</strong> Veri setindeki dengesizliği gidermek için class_weight="balanced" parametresi kullanılmıştır.',
+    dashParamSplit: '<strong>Veri Bölme Oranı:</strong> %80 Eğitim (202.944 satır), %20 Test (50.736 satır)',
+    dashParamValidation: '<strong>Hiperparametre Optimizasyonu:</strong> Stratified 5-Fold Cross-Validation ve Grid Search uygulanmıştır.',
     
     // Paradox
     paradoxTitle: 'Doğruluk Paradoksu (Accuracy Paradox)',
     paradoxSub: 'Klinik taramalarda neden doğruluk tek başına yanıltıcı bir ölçüttür?',
-    paradoxP1: 'CDC BRFSS popülasyon taramasında test grubunun <strong>%86.1’i sağlıklı</strong>, yalnızca <strong>%13.9’u diyabet</strong> teşhisi taşır.',
-    paradoxP2: 'Hiçbir algoritma yazmadan herkese peşinen "Diyabet Değil" diyen bir sistem test verisinde <strong>%86.1 bağıl doğruluk (accuracy)</strong> oranını yakalardı ancak hasta kişilerin hiçbirini tespit edemez (%0 Duyarlılık) ve gerçek teşhis kapasitesini tamamen yitirirdi.',
-    paradoxP3: 'Geliştirdiğimiz dengeli uyarıcı model, duyarlılık payını varsayılan %15.6 katsayısından <strong>%76.2 seviyesine</strong> çarpıcı biçimde yükselterek, klinik tarama aşamasında hayat kurtaracak duyarlı bir eşiğe uyarlanmıştır.',
+    paradoxP1: 'CDC BRFSS popülasyon tarama verilerinde test grubunun <strong>%86.1\'i sağlıklı</strong>, yalnızca <strong>%13.9\'u diyabet</strong> hastasıdır.',
+    paradoxP2: 'Herhangi bir makine öğrenmesi modeli kurmadan herkese peşinen "Diyabet Değil" diyen basit bir yaklaşım, test verisinde <strong>%86.1 doğruluk (accuracy)</strong> oranına ulaşırdı. Ancak hasta olan bireylerin hiçbirini tespit edemezdi (%0 Duyarlılık/Recall).',
+    paradoxP3: 'Geliştirdiğimiz dengeli tahmin modeli, duyarlılık (Recall) oranını normal modeldeki %15.2 seviyesinden <strong>%76.2\'ye</strong> yükselterek, tarama süreçlerinde gerçek hastaları kaçırmayacak hassas bir eşiğe taşınmıştır.',
     
     // Global coefficients
-    globalCoeffTitle: 'Küresel Risk Katsayıları (Global Coefficient Weights)',
-    globalCoeffSub: 'Tüm popülasyonda modelin diyabet olasılığını saptarken baz aldığı en baskın katsayı sütunları',
+    globalCoeffTitle: 'Genel Risk Katsayıları (Model Katsayı Ağırlıkları)',
+    globalCoeffSub: 'Modelin diyabet olasılığını hesaplarken tüm veri kümesinde en çok önem verdiği özellikler',
     coeff1Name: 'Genel Sağlık Değerlendirmesi (GenHlth)',
     coeff2Name: 'Teşhis Edilmiş Yüksek Tansiyon (HighBP)',
     coeff3Name: 'Vücut Kitle İndeksi (BMI)',
-    coeff4Name: 'Yaş Grubu Katsayısı (Age)',
+    coeff4Name: 'Yaş Grubu (Age)',
     coeff5Name: 'Yüksek Kolesterol Teşhisi (HighChol)',
 
     // What-If Simulator
-    whatIfTitle: '🔄 Yaşam Tarzı Senaryo Simülatörü (Duyarlılık Analizi)',
+    whatIfTitle: 'Yaşam Tarzı Senaryo Simülatörü (Duyarlılık Analizi)',
     whatIfDesc: 'Aşağıdaki alışkanlıklarınızı veya ölçümlerinizi değiştirerek risk oranınızın nasıl değişeceğini anlık simüle edin:',
     whatIfBaseline: 'Başlangıç Riski',
-    whatIfSimulated: 'Yeni Simüle Risk',
+    whatIfSimulated: 'Simüle Edilen Risk',
     whatIfImprovement: 'İyileşme Oranı',
     whatIfNoImprovement: 'Değişim Yok',
     whatIfHigherRisk: 'Artan Risk',
     whatIfLowerRisk: 'İyileşme',
-    whatIfInstructions: 'Aşağıdaki düğmeleri açıp kapatarak veya sürgüyü kaydırarak simülasyon yapın:',
+    whatIfInstructions: 'Aşağıdaki butonları ve sürgüyü kullanarak alternatif yaşam tarzı senaryoları simüle edebilirsiniz:',
     
     // PDF Report
     pdfPatientNameLabel: 'Hastanın Adı Soyadı:',
-    pdfPatientNamePlaceholder: 'Rapor için ad soyad girin...',
-    pdfPrintBtn: 'Sağlık Raporunu PDF İndir / Yazdır',
+    pdfPatientNamePlaceholder: 'Rapor için ad soyad giriniz...',
+    pdfPrintBtn: 'Raporu Yazdır',
     pdfReportTitle: 'DİYABET RİSK DEĞERLENDİRME VE TAVSİYE RAPORU',
     pdfReportSub: 'IE410 Proje Çıktısı • Equilibrium Analiz Raporu',
     pdfGeneratedAt: 'Rapor Oluşturma Tarihi:',
-    pdfSignature: 'Sorumlu Mühendis / Analist İmzası:',
+    pdfSignature: 'Onaylayan Hekim / Analist İmzası:',
     
     // BMI WHO Categories
     bmiUnderweight: 'Zayıf',
-    bmiNormal: 'Normal Kilolu',
+    bmiNormal: 'Normal',
     bmiOverweight: 'Fazla Kilolu',
     bmiObese: 'Obez'
   },
@@ -151,19 +151,19 @@ export const TRANSLATIONS = {
     
     // Steps
     step1Label: 'Demography',
-    step1Title: 'Demographic & Social Information',
+    step1Title: 'Demographic and Social Information',
     step1Desc: 'Please specify your age group, sex-related variables, and education/income levels.',
     
     step2Label: 'Body & Health',
-    step2Title: 'Body Measurements & General Health',
+    step2Title: 'Body Measurements and General Health',
     step2Desc: 'Define your biological mass and personal health status.',
     
     step3Label: 'History',
-    step3Title: 'Clinical & Medical History',
+    step3Title: 'Clinical and Medical History',
     step3Desc: 'Please specify diagnoses or vascular conditions confirmed by medical organizations.',
     
     step4Label: 'Lifestyle',
-    step4Title: 'Lifestyle & Habits',
+    step4Title: 'Lifestyle and Habits',
     step4Desc: 'Daily diet, exercise cycle, and basic healthcare system interactions.',
     
     // Buttons
@@ -200,7 +200,7 @@ export const TRANSLATIONS = {
     
     // Results
     resultHeader: 'Calculation Summary',
-    gaugeTitle: 'Trend Analysis Indicator',
+    gaugeTitle: 'Diabetes Risk Indicator',
     gaugeLabel: 'Risk Probability',
     riskLow: 'Low Risk',
     riskMedium: 'Medium Risk',
@@ -210,16 +210,16 @@ export const TRANSLATIONS = {
     explanationHigh: 'Caution: The model detected a high diabetes susceptibility. We advise consulting a physician to measure HbA1c levels.',
     
     // Contributions Tab
-    contributionsTitle: 'Individual Decision Attributes',
+    contributionsTitle: 'Personal Risk Factors Analysis',
     contributionsSub: 'Individual feature impact weights based on model coefficients',
     tabRisk: 'Risk Promoters',
     tabProtective: 'Protective Factors',
     noFactors: 'No defining factor was detected in this category.',
-    posCorr: 'Positive Correlation',
-    negCorr: 'Negative Correlation',
+    posCorr: 'Risk Increasing Factor',
+    negCorr: 'Risk Decreasing (Protective) Factor',
     
     // Recommendations
-    recTitle: 'Clinical Lifestyle Recommendations',
+    recTitle: 'Lifestyle and Health Recommendations',
     recHighBP: '<strong>Blood Pressure Control:</strong> You have high blood pressure. Limiting sodium and taking prescribed medication drastically reduces diabetes onset risk.',
     recHighChol: '<strong>Cholesterol Management:</strong> High cholesterol triggers insulin resistance. Avoid trans-fats and increase fiber intake (oats, legumes).',
     recObese: '<strong>Weight Management:</strong> Your BMI is in the obese range. Losing just 5% to 8% of body weight significantly improves insulin sensitivity.',
@@ -253,11 +253,11 @@ export const TRANSLATIONS = {
     coeff1Name: 'General Health Rating (GenHlth)',
     coeff2Name: 'High Blood Pressure Status (HighBP)',
     coeff3Name: 'Body Mass Index (BMI)',
-    coeff4Name: 'Age Category Weight (Age)',
+    coeff4Name: 'Age Category (Age)',
     coeff5Name: 'High Cholesterol Diagnosis (HighChol)',
 
     // What-If Simulator
-    whatIfTitle: '🔄 Lifestyle Scenario Simulator (Sensitivity Analysis)',
+    whatIfTitle: 'Lifestyle Scenario Simulator (Sensitivity Analysis)',
     whatIfDesc: 'Simulate how changing your clinical measurements or habits would dynamically impact your diabetes risk:',
     whatIfBaseline: 'Baseline Risk',
     whatIfSimulated: 'Hypothetical Risk',
@@ -270,15 +270,15 @@ export const TRANSLATIONS = {
     // PDF Report
     pdfPatientNameLabel: "Patient's Full Name:",
     pdfPatientNamePlaceholder: 'Enter patient name for report...',
-    pdfPrintBtn: 'Download PDF / Print Health Report',
+    pdfPrintBtn: 'Print Report',
     pdfReportTitle: 'DIABETES RISK ASSESSMENT AND RECOMMENDATIONS REPORT',
     pdfReportSub: 'IE410 Project Outcome • Equilibrium Analysis Output',
     pdfGeneratedAt: 'Report Generated On:',
-    pdfSignature: 'Responsible Engineer / Analyst Signature:',
+    pdfSignature: 'Approving Physician / Analyst Signature:',
     
     // BMI WHO Categories
     bmiUnderweight: 'Underweight',
-    bmiNormal: 'Normal Weight',
+    bmiNormal: 'Normal',
     bmiOverweight: 'Overweight',
     bmiObese: 'Obese'
   }
@@ -296,79 +296,79 @@ export const FEATURE_METADATA_LOCALIZED = {
     },
     CholCheck: {
       label: 'Kolesterol Kontrolü',
-      desc: 'Son 5 yıl içerisinde kolesterol seviyesinin en az bir kez ölçülmüş olması.',
+      desc: 'Son 5 yılda en az bir kez kolesterol ölçümü yaptırmış olmak.',
     },
     BMI: {
       label: 'Vücut Kitle İndeksi (BMI)',
-      desc: 'Kilonuzun (kg) boyunuzun karesine (m²) oranı. (>30 obezite kabul edilir).',
+      desc: 'Kilonuzun boyunuzun karesine oranı (kg/m²). 30 ve üzeri obezite olarak kabul edilir.',
     },
     Smoker: {
       label: 'Sigara Kullanımı',
-      desc: 'Hayatı boyunca en az 100 adet (5 paket) sigara içmiş olmak.',
+      desc: 'Hayatınız boyunca en az 100 adet (5 paket) sigara içmiş olmak.',
     },
     Stroke: {
       label: 'Felç Geçmişi',
-      desc: 'Daha önce geçici ya da kalıcı inme/felç öyküsünün olması.',
+      desc: 'Daha önce inme (felç) geçirmiş olmak.',
     },
     HeartDiseaseorAttack: {
       label: 'Kalp Rahatsızlığı',
-      desc: 'Koroner kalp hastalığı veya kalp krizi geçirmiş olmak.',
+      desc: 'Koroner kalp hastalığı veya kalp krizi öyküsünün bulunması.',
     },
     PhysActivity: {
       label: 'Fiziksel Aktivite',
-      desc: 'Son 30 günde rutin iş dışında yürüyüş, koşu veya egzersiz yapmış olmak.',
+      desc: 'Son 30 günde iş dışındaki zamanlarda düzenli egzersiz veya fiziksel aktivite yapmış olmak.',
     },
     Fruits: {
       label: 'Meyve Tüketimi',
-      desc: 'Günde en az bir kez taze veya dondurulmuş meyve tüketmek.',
+      desc: 'Günde en az bir kez meyve tüketmek.',
     },
     Veggies: {
       label: 'Sebze Tüketimi',
-      desc: 'Günde en az bir kez yeşil yapraklı veya taze sebze tüketmek.',
+      desc: 'Günde en az bir kez sebze tüketmek.',
     },
     HvyAlcoholConsump: {
       label: 'Aşırı Alkol Tüketimi',
-      desc: 'Haftada erkekler için 14, kadınlar için 8 kadehten fazla alkol kullanımı.',
+      desc: 'Aşırı alkol tüketimi (Erkekler için haftada 14, kadınlar için 8 kadehten fazla).',
     },
     AnyHealthcare: {
       label: 'Sağlık Güvencesi',
-      desc: 'SGK, özel sağlık sigortası veya benzeri kapsayıcı bir güvencenin olması.',
+      desc: 'Herhangi bir sağlık güvencesine (SGK, özel sigorta vb.) sahip olmak.',
     },
     NoDocbcCost: {
       label: 'Maddi Engeller',
-      desc: 'Son 12 ayda parasal imkansızlıklar nedeniyle doktora gidememiş olmak.',
+      desc: 'Son 12 ayda mali nedenlerden dolayı doktora gidilemeyen bir durum yaşanmış olması.',
     },
     GenHlth: {
       label: 'Genel Sağlık Değerlendirmesi',
-      desc: 'Bireyin kendi sağlık durumunu 1 (Mükemmel) ile 5 (Kötü) arasında puanlaması.',
+      desc: 'Kendi genel sağlık durumunuzu nasıl değerlendirdiğiniz (1: Mükemmel, 5: Kötü).',
     },
     MentHlth: {
       label: 'Ruh Sağlığı Şikayeti',
-      desc: 'Son 30 günün kaç gününde depresyon, stres veya ruhsal sıkıntı yaşandı (0-30).',
+      desc: 'Son 30 günde stres, depresyon veya ruhsal açıdan kötü hissettiğiniz gün sayısı (0-30).',
     },
     PhysHlth: {
       label: 'Fiziksel Sağlık Şikayeti',
-      desc: 'Son 30 günün kaç gününde hastalık, ağrı veya yaralanma yaşandı (0-30).',
+      desc: 'Son 30 günde hastalık, ağrı veya bedensel yaralanma nedeniyle fiziksel olarak kötü hissettiğiniz gün sayısı (0-30).',
     },
     DiffWalk: {
       label: 'Yürüme/Merdiven Zorluğu',
-      desc: 'Düz yolda yürürken veya merdiven çıkarken ciddi düzeyde zorlanma yaşamak.',
+      desc: 'Yürürken veya merdiven çıkarken ciddi düzeyde zorlanma yaşanması.',
     },
     Sex: {
       label: 'Biyolojik Cinsiyet',
-      desc: 'Doğuştan gelen biyolojik cinsiyet (Biyolojik Kadın / Biyolojik Erkek).',
+      desc: 'Biyolojik cinsiyet (Biyolojik Kadın / Biyolojik Erkek).',
     },
     Age: {
       label: 'Yaş Grubu',
-      desc: '18 yaşından başlayan 13 farklı kategoride yaş grubu aralıkları.',
+      desc: 'Yaş grubu kategorisi (18 yaşından itibaren).',
     },
     Education: {
       label: 'Eğitim Seviyesi',
-      desc: 'Bireyin aldığı en yüksek eğitim derecesi (Okuma-yazma yok ile üniversite mezuniyeti arası).',
+      desc: 'En yüksek eğitim derecesi.',
     },
     Income: {
       label: 'Yıllık Hane Geliri',
-      desc: 'Tüm hane halkının toplam yıllık brüt kazanç grubu (1 (Düşük) ile 8 (Yüksek)).',
+      desc: 'Yıllık hane halkı toplam brüt gelir grubu.',
     },
   },
   en: {
