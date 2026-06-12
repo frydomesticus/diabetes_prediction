@@ -171,7 +171,7 @@ Projenin web uygulamasını kendi bilgisayarınızda yerel olarak çalıştırma
 1. **Projeyi Klonlayın:**
    ```bash
    git clone https://github.com/frydomesticus/diabetes_prediction.git
-   cd diabetes_prediction/web_react
+   cd diabetes_prediction/web
    ```
 
 2. **Bağımlılıkları Yükleyin:**
