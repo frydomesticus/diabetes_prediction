@@ -147,6 +147,11 @@ export default function App() {
     }
   }, [theme]);
 
+  // Sync document language attribute
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   // Sync whatIfData when results are shown
   useEffect(() => {
     if (showResults) {
