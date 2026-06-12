@@ -1,0 +1,150 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  
+  --color-brand-bg: #F4F4F1;
+  --color-brand-card: #FFFFFF;
+  --color-brand-dark: #1A1A1A;
+  --color-brand-indigo: #1A1A1A;
+  --color-brand-cyan: #1A1A1A;
+  --color-brand-emerald: #1D4ED8; /* Balanced rich royal blue / deep green */
+  --color-brand-amber: #B45309;
+  --color-brand-rose: #B91C1C;
+}
+
+/* Custom Base Rules & Architectural Geometric Alignment */
+body {
+  background-color: #F4F4F1;
+  color: #1A1A1A;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Symmetric & Rigid Decorative Background Composition */
+.background-decor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Geometric balance lines/circles for architectural mood */
+.circle {
+  position: absolute;
+  border: 1px solid rgba(26, 26, 26, 0.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.circle-1 {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -200px;
+  background: rgba(26, 26, 26, 0.015);
+}
+
+.circle-2 {
+  width: 800px;
+  height: 800px;
+  bottom: -300px;
+  right: -300px;
+  background: rgba(26, 26, 26, 0.01);
+}
+
+.circle-3 {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+/* Monolith Card styling: Sharp structural logic, flat borders, high elegance */
+.glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  border-radius: 0px; /* Rigid geometric sharp corners */
+  box-shadow: none; /* Mathematical balance: flat over shadows */
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(26, 26, 26, 0.25);
+}
+
+/* Solid Monochrome Gauge styling */
+.gauge-bg {
+  fill: none;
+  stroke: rgba(26, 26, 26, 0.08);
+  stroke-width: 8;
+}
+
+.gauge-value {
+  fill: none;
+  stroke: #1A1A1A;
+  stroke-width: 8;
+  stroke-dasharray: 502;
+  transition: stroke-dashoffset 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Custom Scrollbar for factor details list */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(26, 26, 26, 0.03);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 26, 0.2);
+  border-radius: 0px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 26, 26, 0.45);
+}
+
+/* Elegant minimalist range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(26, 26, 26, 0.08);
+  border-radius: 0px;
+  height: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 0px; /* Sharp geometry */
+  background: #1A1A1A;
+  cursor: pointer;
+  border: 1px solid #1A1A1A;
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
