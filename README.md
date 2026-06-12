@@ -141,20 +141,27 @@ Veri setinde sağlıklı bireyler %86.07 iken, diyabet hastaları yalnızca %13.
 
 ---
 
-## Proje Dizin Yapısı
+## Proje Genel Klasör Yapısı (Project Structure)
 
-Web uygulamasının kaynak kodları ve bileşen yapısı aşağıdaki gibidir:
+Proje, hem veri bilimi çalışmalarını hem de tarayıcı tabanlı tahmin uygulamasını içeren monorepo tarzı bir yapıya sahiptir:
 
 ```
-src/
-├── assets/             # Logo ve görsel materyaller
-├── types.ts            # TypeScript arabirim tanımları
-├── utils/
-│   ├── model.ts        # Z-Skoru Normalizasyonu ve Lojistik Regresyon tahmin motoru
-│   └── translations.ts # Türkçe ve İngilizce dil sözlüğü (emojisiz, düzeltilmiş)
-├── App.tsx             # Ana uygulama bileşeni ve durum yönetimi
-├── main.tsx            # React DOM başlatma noktası
-└── index.css           # Tailwind CSS ve özel cam efekti (glassmorphism) stilleri
+├── data/               # CDC BRFSS 2015 ham veri setleri (raw/)
+├── notebooks/          # Model ön işleme ve eğitim çalışmaları (Study-1, Study-2, Study-3)
+├── outputs/            # Eğitilen modelin katsayıları ve istatistiksel parametreleri
+├── scripts/            # Veri ön işleme ve model eğitim betikleri
+├── docs/               # Akademik ve teknik dökümantasyonlar
+└── web/                # React + Vite + TypeScript web uygulamasının ana klasörü
+    ├── src/
+    │   ├── assets/     # Logo ve görsel materyaller
+    │   ├── types.ts    # TypeScript arabirim tanımları
+    │   ├── utils/
+    │   │   ├── model.ts        # Z-Skoru ve Lojistik Regresyon tahmin motoru
+    │   │   └── translations.ts # Türkçe/İngilizce dil sözlüğü
+    │   ├── App.tsx     # Ana uygulama ve durum yönetimi
+    │   └── main.tsx    # React DOM başlatma noktası
+    ├── index.html      # Favicon tanımlı ana şablon
+    └── tsconfig.json   # TypeScript yapılandırması
 ```
 
 ---

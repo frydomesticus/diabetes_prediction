@@ -1,0 +1,6 @@
+{
+  "name": "Diyabet Risk Analiz Platformu",
+  "description": "IE410 Advanced Computer Programming - CDC BRFSS 2015 veri seti tabanlı dengeli makine öğrenmesi ve diyabet riski hesaplayıcı web platformu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
