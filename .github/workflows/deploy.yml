@@ -1,13 +1,14 @@
-name: Continuous Integration
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+
+permissions:
+  contents: write
 
 jobs:
-  verify:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,8 +25,14 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run type checking (Lint)
+    - name: Run lint (Type check)
       run: npm run lint
 
-    - name: Run build check
+    - name: Run build
       run: npm run build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
