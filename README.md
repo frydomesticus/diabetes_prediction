@@ -1,18 +1,18 @@
-# 🩺 Equilibrium: Diyabet Risk Analiz ve Değerlendirme Platformu
+# Equilibrium: Diyabet Risk Analiz ve Değerlendirme Platformu
 
 <div align="center">
   <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80" alt="Equilibrium Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
 
-  [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+  [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![Vite](https://img.shields.io/badge/Vite-6.x-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
   [![License](https://img.shields.io/badge/License-Apache_2.0-D22128?style=for-the-badge)](LICENSE)
 </div>
 
 ---
 
-## 🏫 Akademik Bilgiler & Proje Künyesi
+## Akademik Bilgiler ve Proje Künyesi
 
 Bu proje, **Ankara Yıldırım Beyazıt Üniversitesi Mühendislik ve Doğa Bilimleri Fakültesi Endüstri Mühendisliği Bölümü** bünyesinde yürütülen **IE410 Advanced Computer Programming** dersi final çalışması kapsamında geliştirilmiştir.
 
@@ -23,13 +23,13 @@ Bu proje, **Ankara Yıldırım Beyazıt Üniversitesi Mühendislik ve Doğa Bili
 
 ---
 
-## 📌 Proje Genel Bakışı (Project Overview)
+## Proje Genel Bakışı (Project Overview)
 
 **Equilibrium**, ABD Hastalık Kontrol ve Önleme Merkezleri (CDC) tarafından gerçekleştirilen **BRFSS 2015** (Behavioral Risk Factor Surveillance System) sağlık anket verileri üzerinde eğitilmiş yüksek performanslı bir makine öğrenmesi modelini temel alır. 
 
 Geliştirilen bu web uygulaması, kullanıcıların demografik, klinik ve yaşam tarzı nitelikteki **21 farklı parametresini** alarak, diyabet geliştirme olasılıklarını **sunucusuz ve tamamen tarayıcı tarafında (client-side)** milisaniyeler içerisinde hesaplar ve kullanıcıya anlaşılır analizler sunar.
 
-### 🌐 Neden İstemci Tabanlı (Client-Side) Tahmin Mimarisi?
+### Neden İstemci Tabanlı (Client-Side) Tahmin Mimarisi?
 Geleneksel makine öğrenmesi uygulamaları, tahmin üretmek için girdileri arka plandaki bir API sunucusuna (Python/Flask/FastAPI vb.) gönderir. Equilibrium ise eğitilmiş modelin tüm matematiksel katsayılarını ve standardizasyon parametrelerini tarayıcıya (TypeScript katmanına) gömer. Bu mimarinin avantajları:
 1. **Sıfır Sunucu Maliyeti (Serverless):** API sunucusu ihtiyacı ortadan kalktığı için proje, GitHub Pages gibi statik web sunucularında ücretsiz olarak barındırılabilir.
 2. **Kişisel Veri Gizliliği (Privacy-First):** Kullanıcının boyu, kilosu, yaş grubu veya kronik hastalık geçmişi gibi hassas sağlık verileri hiçbir sunucuya gönderilmez, tamamen kullanıcının bilgisayarında işlenir.
@@ -37,7 +37,31 @@ Geleneksel makine öğrenmesi uygulamaları, tahmin üretmek için girdileri ark
 
 ---
 
-## 📐 Bireysel Risk Tahmini Matematiksel Altyapısı
+## Öne Çıkan Premium Özellikler
+
+Uygulama, en üst düzey kullanıcı deneyimi için aşağıdaki gelişmiş özelliklerle donatılmıştır:
+
+### 1. Çoklu Dil Desteği (TR / EN)
+* Arayüzün sağ üst köşesindeki dil seçim butonu ile tüm platform anında Türkçe ve İngilizce arasında geçiş yapar.
+* Tüm sorular, seçenekler, açıklayıcı metinler, tıbbi öneriler ve katsayı panelleri lokalize edilmiştir.
+* Tarayıcının büyük harfe çevirme (`text-transform: uppercase`) kurallarını Türkçe dil standartlarına göre (örn. `i` -> `İ`, `ı` -> `I`) işleyebilmesi için, seçilen dil `document.documentElement.lang` ile dinamik olarak senkronize edilmiştir.
+
+### 2. Duyarlılık Analizi (What-If Simulator)
+* Sonuç sayfasında, kullanıcının o anki durumuna dayalı dinamik bir simülasyon paneli yer alır.
+* Kullanıcılar BMI (Vücut Kitle İndeksi), Sigara kullanımı, Fiziksel Aktivite, Yüksek Tansiyon ve Yüksek Kolesterol değişkenlerini değiştirerek risklerinin gerçek zamanlı olarak nasıl değişeceğini simüle edebilir.
+* Risk düşüşü durumunda yeşil renkli bir **İyileşme (Improvement)** rozeti, risk artışı durumunda ise kırmızı renkli bir **Artış (Increase)** rozeti görüntülenir.
+
+### 3. Karanlık / Aydınlık Tema Toggleyicisi
+* Sağ üstteki buton sayesinde obsidian siyahı cam (glassmorphism) karanlık tema ile yumuşak kum/kağıt tonlarındaki aydınlık tema arasında geçiş yapılabilir.
+* Tailwind v4'ün `@custom-variant dark (&:where(.dark, .dark *));` özelliği kullanılarak, sistem renk tercihlerinden bağımsız olarak gövdeye eklenen `.dark` sınıfına göre kararlı bir tema yönetimi sağlanmıştır.
+
+### 4. Profesyonel PDF Sağlık Raporu
+* Tarayıcının yazdırma altyapısını kullanan `@media print` stil kuralları entegre edilmiştir.
+* Kullanıcı ismini girip "Raporu Yazdır / Print Report" tıkladığında, menüler, butonlar ve simülatör gibi yazdırılması gerekmeyen bileşenler gizlenir. Sadece hastanın girmiş olduğu veriler, risk yüzdesi göstergesi ve tıbbi öneriler profesyonel bir hekim raporu formatında yazdırılır.
+
+---
+
+## Bireysel Risk Tahmini Matematiksel Altyapısı
 
 Modelin tarayıcı tarafındaki tahmin motoru, Python scikit-learn kütüphanesinde eğitilen en iyi **Dengeli Lojistik Regresyon (Balanced Logistic Regression)** parametrelerini kullanır. 
 
@@ -47,7 +71,7 @@ $$z = \beta_0 + \sum_{i=1}^{21} \beta_i \cdot \left(\frac{X_i - \mu_i}{\sigma_i}
 
 $$P(\text{Diyabet} = 1) = \frac{1}{1 + e^{-z}}$$
 
-### 📊 Model Parametreleri ve Katsayı Tablosu
+### Model Parametreleri ve Katsayı Tablosu
 
 Uygulamanın `src/utils/model.ts` dosyasında tanımlı olan ve CDC BRFSS veri setinin tamamında eğitilen katsayılar ($\beta_i$), ortalamalar ($\mu_i$) ve standart sapmalar ($\sigma_i$) aşağıda listelenmiştir:
 
@@ -64,7 +88,7 @@ Uygulamanın `src/utils/model.ts` dosyasında tanımlı olan ve CDC BRFSS veri s
 | 8 | `PhysActivity` | Son 30 Günde Fiziksel Aktivite | 0.756992 | 0.428900 | -0.019449 | 🛡️ Koruyucu Etki |
 | 9 | `Fruits` | Günde ≥ 1 Porsiyon Meyve | 0.634426 | 0.481591 | -0.034836 | 🛡️ Koruyucu Etki |
 | 10 | `Veggies` | Günde ≥ 1 Porsiyon Sebze | 0.811426 | 0.391170 | -0.007297 | 🛡️ Koruyucu Etki |
-| 11 | `HvyAlcoholConsump` | Aşırı Alkol Tüketimi (Haftalık) | 0.055730 | 0.229399 | -0.172950 | 🛡️ İstatistiksel Koruyucu (Yanıltıcı katsayı)* |
+| 11 | `HvyAlcoholConsump` | Aşırı Alkol Tüketimi (Haftalık) | 0.055730 | 0.229399 | -0.172950 | 🛡️ İstatistiksel Koruyucu |
 | 12 | `AnyHealthcare` | Sağlık Sigortası Sahipliği | 0.951149 | 0.215556 | 0.013940 | 📈 Hafif Risk Artırıcı |
 | 13 | `NoDocbcCost` | Maddi Nedenle Doktora Gidememe | 0.084624 | 0.278322 | 0.013420 | 📈 Hafif Risk Artırıcı |
 | 14 | `GenHlth` | Genel Sağlık Durumu Algısı (1-5) | 2.511836 | 1.068375 | 0.618830 | 📈 En Güçlü Risk Artırıcı |
@@ -76,11 +100,9 @@ Uygulamanın `src/utils/model.ts` dosyasında tanımlı olan ve CDC BRFSS veri s
 | 20 | `Education` | Eğitim Durumu (1-6 Skalası) | 5.049925 | 0.986382 | -0.037379 | 🛡️ Koruyucu Etki |
 | 21 | `Income` | Gelir Seviyesi (1-8 Skalası) | 6.050832 | 2.072656 | -0.119336 | 🛡️ Koruyucu Etki |
 
-> \* *Not: `HvyAlcoholConsump` özelliğinin katsayısının negatif çıkması veri tabanındaki karmaşık değişken (confounding variable) etkilerinden kaynaklanmaktadır ve tıbbi bir öneri niteliği taşımaz.*
-
 ---
 
-## 🔍 Metodoloji ve Veri Bilimi Aşamaları (CRISP-DM)
+## Metodoloji ve Veri Bilimi Aşamaları (CRISP-DM)
 
 Proje süresince 3 bağımsız akademik çalışma (Study-1, Study-2, Study-3) yürütülmüştür. Bu çalışmaların detayları aşağıda özetlenmiştir:
 
@@ -91,10 +113,10 @@ Proje süresince 3 bağımsız akademik çalışma (Study-1, Study-2, Study-3) y
 [STUDY-1: Keşifsel Veri Analizi ve Aykırı Değerler (IQR/Z-Score)]
               │
               ▼
-[STUDY-2: Model Eleme (SVM, KNN, GB Elendi) & GridSearchCV (Nested 5-Fold CV)]
+[STUDY-2: Model Eleme & GridSearchCV (Nested 5-Fold CV)]
               │
               ▼
-[STUDY-3: Dengesiz Sınıf Çözümleri (Class-Weight Balanced & SMOTE)]
+[STUDY-3: Dengesiz Sınıf Çözümleri (Class-Weight Balanced)]
               │
               ▼
 [Açıklanabilir Yapay Zeka (XAI) & SHAP Analizleri]
@@ -103,57 +125,33 @@ Proje süresince 3 bağımsız akademik çalışma (Study-1, Study-2, Study-3) y
 [Arayüz Katmanı: TypeScript + React Client-Side Karar Motoru]
 ```
 
-### 📈 Study-1: Veri Ön İşleme ve Aykırı Değer Analizi
+### Study-1: Veri Ön İşleme ve Aykırı Değer Analizi
 * **Aykırı Değer Filtresi:** Z-Skoru ve IQR yöntemleriyle sürekli değişken olan BMI üzerindeki uç değerler analiz edilmiştir.
 * **Korelasyon Analizi:** `GenHlth` (Genel Sağlık Algısı: 0.308), `HighBP` (Yüksek Tansiyon: 0.273) ve `BMI` (Vücut Kitle Endeksi: 0.221) diyabet ile en yüksek doğrusal ilişkiye sahip özellikler olarak tespit edilmiştir.
-* **Özellik Seçimi:** SelectKBest (Ki-Kare), RFE (Recursive Feature Elimination) ve PCA (Temel Bileşenler Analizi) karşılaştırılarak veri setindeki tüm 21 özelliğin bilgi içeriğinin yüksek olduğu saptanmış ve modelde korunmasına karar verilmiştir.
+* **Özellik Seçimi:** SelectKBest (Ki-Kare), RFE ve PCA karşılaştırılarak veri setindeki tüm 21 özelliğin bilgi içeriğinin yüksek olduğu saptanmış ve modelde korunmasına karar verilmiştir.
 
-### ⚖️ Study-2: Model Tarama ve Hiperparametre Optimizasyonu
-* **Model Eleme Aşaması:** 6 farklı algoritma (Lojistik Regresyon, Karar Ağaçları, Rastgele Orman, Gradyan Artırma, SVM ve KNN) 5.000 örneklemlik alt kümede taranmıştır. 
-  * *SVM* yavaşlığı (O(n²)), *KNN* bellek tüketimi, *Gradient Boosting* ise Random Forest ile benzer performansı daha yüksek işlem yüküyle vermesi sebebiyle elenmiştir.
-* **GridSearchCV ve Nested Cross-Validation:** Geriye kalan 3 model (LR, DT, RF) 30.000 örneklemlik veri üzerinde hiperparametre taramasına tabi tutulmuştur. Sınıf dağılımını korumak adına **Stratified 5-Fold CV** kullanılmıştır. Karar Ağaçları modelinde maksimum derinlik sınırlaması yapılarak aşırı öğrenme (overfitting) engellenmiş ve test skoru %7.9 iyileştirilmiştir.
+### Study-2: Model Tarama ve Hiperparametre Optimizasyonu
+* **Model Eleme Aşaması:** 6 farklı algoritma (Lojistik Regresyon, Karar Ağaçları, Rastgele Orman, Gradyan Artırma, SVM ve KNN) 5.000 örneklemlik alt kümede taranmıştır. SVM ve KNN yüksek işlem yükü sebebiyle elenmiştir.
+* **GridSearchCV ve Nested Cross-Validation:** Geriye kalan modeller 30.000 örneklemlik veri üzerinde hiperparametre taramasına tabi tutulmuştur. Sınıf dağılımını korumak adına **Stratified 5-Fold CV** kullanılmıştır.
 
-### 🎯 Study-3: Sınıf Dengesizliği (Class Imbalance) ve Doğruluk Paradoksu (Accuracy Paradox)
-Veri setinde sağlıklı bireyler %86.07 iken, diyabet hastaları yalnızca %13.93 oranındadır (yaklaşık 6.2 : 1 oranında dengesizlik). 
-* **Doğruluk Paradoksu:** Standart modeller eğitildiğinde **%86.4 doğruluk (accuracy)** oranına ulaşmakta, ancak diyabet hastalarını yakalama oranı (Recall/Duyarlılık) **%15 civarında kalmaktadır**. Yani model, neredeyse tüm diyabet hastalarını ıskalamaktadır.
+### Study-3: Sınıf Dengesizliği (Class Imbalance) ve Doğruluk Paradoksu (Accuracy Paradox)
+Veri setinde sağlıklı bireyler %86.07 iken, diyabet hastaları yalnızca %13.93 oranındadır.
+* **Doğruluk Paradoksu:** Standart modeller eğitildiğinde %86.4 doğruluk oranına ulaşmakta, ancak diyabet hastalarını yakalama oranı (Recall/Duyarlılık) %15 civarında kalmaktadır.
 * **Çözüm:** Modelin hata fonksiyonunda azınlık sınıfına (diyabetliler) daha yüksek ceza puanı veren `class_weight='balanced'` stratejisi uygulanmıştır. Böylece diyabetli hastaları doğru tahmin etme oranı (Recall) **%15.2'den %76.2'ye** yükseltilmiş ve ROC AUC skoru **0.8226** olarak optimize edilmiştir.
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler ve Kütüphaneler
-
-### Veri Bilimi & Python Katmanı
-* **Pandas & NumPy:** Veri işleme, manipülasyon ve matris hesaplamaları.
-* **Scikit-Learn:** Model eğitimi, StandardScaler, GridSearchCV, Metrik hesaplama.
-* **Matplotlib & Seaborn:** Keşifsel veri analiz grafikleri, ROC ve Korelasyon matrisleri.
-* **SHAP (SHapley Additive exPlanations):** Global ve local model kararlarının matematiksel yorumlanması.
-* **Pickle:** Eğitilen nihai modellerin serileştirilmesi.
-
-### Arayüz & Web Geliştirme Katmanı
-* **React 18 & Vite:** Hızlı, modüler ve bileşen tabanlı SPA (Single Page Application) geliştirme.
-* **TypeScript:** Güvenli veri tipleri ve model katsayılarının hatasız yönetimi.
-* **Tailwind CSS:** Modern, duyarlı (responsive) ve şık kullanıcı arayüzü tasarımı.
-* **Framer Motion:** Yumuşak sayfa geçişleri, adım ilerlemeleri ve etkileşimli mikro-animasyonlar.
-* **Lucide Icons:** Modern ve minimalist vektörel ikon kütüphanesi.
-
----
-
-## 📂 Proje Dizin Yapısı
+## Proje Dizin Yapısı
 
 Web uygulamasının kaynak kodları ve bileşen yapısı aşağıdaki gibidir:
 
 ```
 src/
 ├── assets/             # Logo ve görsel materyaller
-├── components/         # Yeniden kullanılabilir React bileşenleri
-│   ├── FormStep.tsx    # Kademeli form yapısının adımları
-│   ├── ModelMetrics.tsx# Akademik performans ve doğruluk paradoksu paneli
-│   └── ResultCard.tsx  # Tahmin sonuçları, olasılık barı ve etki analiz grafikleri
-├── data/
-│   └── questions.ts    # Formda sorulan Türkçe sorular ve seçenek veri yapısı
-├── types.ts            # TypeScript arabirim tanımları ve UTF-8 Türkçe sözlük
+├── types.ts            # TypeScript arabirim tanımları
 ├── utils/
-│   └── model.ts        # Z-Skoru Normalizasyonu ve Lojistik Regresyon tahmin motoru
+│   ├── model.ts        # Z-Skoru Normalizasyonu ve Lojistik Regresyon tahmin motoru
+│   └── translations.ts # Türkçe ve İngilizce dil sözlüğü (emojisiz, düzeltilmiş)
 ├── App.tsx             # Ana uygulama bileşeni ve durum yönetimi
 ├── main.tsx            # React DOM başlatma noktası
 └── index.css           # Tailwind CSS ve özel cam efekti (glassmorphism) stilleri
@@ -161,7 +159,7 @@ src/
 
 ---
 
-## 💻 Yerel Geliştirme ve Kurulum Kılavuzu
+## Yerel Geliştirme ve Kurulum Kılavuzu
 
 Projenin web uygulamasını kendi bilgisayarınızda yerel olarak çalıştırmak için aşağıdaki adımları izleyebilirsiniz.
 
@@ -173,7 +171,7 @@ Projenin web uygulamasını kendi bilgisayarınızda yerel olarak çalıştırma
 1. **Projeyi Klonlayın:**
    ```bash
    git clone https://github.com/frydomesticus/diabetes_prediction.git
-   cd diabetes_prediction
+   cd diabetes_prediction/web_react
    ```
 
 2. **Bağımlılıkları Yükleyin:**
@@ -185,27 +183,16 @@ Projenin web uygulamasını kendi bilgisayarınızda yerel olarak çalıştırma
    ```bash
    npm run dev
    ```
-   *Sunucu varsayılan olarak `http://localhost:5173` (veya terminalde belirtilen başka bir portta) yayına başlayacaktır.*
+   *Sunucu varsayılan olarak `http://localhost:3000/` adresinde yayına başlayacaktır.*
 
 4. **Üretim Derlemesi Alın (Production Build):**
    ```bash
    npm run build
    ```
-   *Bu komut, uygulamanın optimize edilmiş statik HTML, JS ve CSS dosyalarını `dist` klasörü içerisine çıkarır. Bu klasörü doğrudan herhangi bir statik sunucuda barındırabilirsiniz.*
+   *Bu komut, uygulamanın optimize edilmiş statik HTML, JS ve CSS dosyalarını `dist` klasörü içerisine çıkarır.*
 
 ---
 
-## 🎨 Arayüz Tasarımı ve Kullanıcı Deneyimi (UX/UI)
-
-Uygulama, modern web tasarımının en son trendleri kullanılarak tasarlanmıştır:
-* **Glassmorphism (Cam Efekti):** Yarı saydam arka planlar ve yumuşak kenarlıklar ile derinlik hissi oluşturulmuştur.
-* **Dark Mode:** Göz yormayan, kontrastı yüksek koyu tema renk paleti.
-* **Responsive Layout:** Hem mobil cihazlarda hem de masaüstü ekranlarda kusursuz çalışan esnek ızgara (flex/grid) sistemi.
-* **Canlı Grafik Analizleri:** Kullanıcının hangi alışkanlığının (örneğin BMI veya yüksek tansiyon) risk oranını ne kadar artırdığını gösteren anlık, renk kodlu yatay çubuk grafikler.
-* **Akademik Performans Paneli:** Projenin arka planındaki makine öğrenmesi metriklerini (ROC eğrisi açıklaması, Recall değerleri, Doğruluk Paradoksu analizi) merak eden geliştiriciler ve akademisyenler için detaylı bir teknik bilgi sekmesi.
-
----
-
-## 📄 Lisans
+## Lisans
 
 Bu proje **Apache License 2.0** lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına göz atabilirsiniz.
