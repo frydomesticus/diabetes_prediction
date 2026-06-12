@@ -5,43 +5,41 @@
 
 import { DiabetesFeatures, PredictionResult, Contribution, FEATURE_METADATA } from '../types';
 
-// Statistical parameters calculated from the CDC BRFSS 2015 dataset
-// For scaling: (value - mean) / std
+// Study-3'te eğitilen en iyi Logistic Regression modelinin ve StandardScaler nesnesinin gerçek parametreleri
 const MODEL_STATS: Record<keyof DiabetesFeatures, { mean: number; std: number; beta: number }> = {
-  HighBP: { mean: 0.429, std: 0.495, beta: 0.762 },
-  HighChol: { mean: 0.424, std: 0.494, beta: 0.548 },
-  CholCheck: { mean: 0.963, std: 0.189, beta: 0.145 },
-  BMI: { mean: 28.382, std: 6.608, beta: 0.585 },
-  Smoker: { mean: 0.443, std: 0.497, beta: 0.048 },
-  Stroke: { mean: 0.041, std: 0.197, beta: 0.162 },
-  HeartDiseaseorAttack: { mean: 0.094, std: 0.292, beta: 0.285 },
-  PhysActivity: { mean: 0.757, std: 0.429, beta: -0.124 },
-  Fruits: { mean: 0.634, std: 0.482, beta: -0.045 },
-  Veggies: { mean: 0.811, std: 0.391, beta: -0.078 },
-  HvyAlcoholConsump: { mean: 0.056, std: 0.230, beta: -0.115 },
-  AnyHealthcare: { mean: 0.951, std: 0.216, beta: 0.035 },
-  NoDocbcCost: { mean: 0.084, std: 0.278, beta: 0.078 },
-  GenHlth: { mean: 2.511, std: 1.068, beta: 0.684 },
-  MentHlth: { mean: 3.185, std: 7.413, beta: 0.056 },
-  PhysHlth: { mean: 4.242, std: 8.714, beta: 0.092 },
-  DiffWalk: { mean: 0.168, std: 0.374, beta: 0.245 },
-  Sex: { mean: 0.440, std: 0.496, beta: 0.215 },
-  Age: { mean: 8.032, std: 3.054, beta: 0.482 },
-  Education: { mean: 4.823, std: 0.986, beta: -0.095 },
-  Income: { mean: 6.054, std: 2.071, beta: -0.165 },
+  HighBP: { mean: 0.428995, std: 0.494933, beta: 0.364257 },
+  HighChol: { mean: 0.424304, std: 0.494237, beta: 0.287265 },
+  CholCheck: { mean: 0.962418, std: 0.190183, beta: 0.247702 },
+  BMI: { mean: 28.377961, std: 6.598277, beta: 0.490585 },
+  Smoker: { mean: 0.442861, std: 0.496724, beta: 0.002148 },
+  Stroke: { mean: 0.040405, std: 0.196908, beta: 0.037238 },
+  HeartDiseaseorAttack: { mean: 0.094248, std: 0.292173, beta: 0.073048 },
+  PhysActivity: { mean: 0.756992, std: 0.428900, beta: -0.019449 },
+  Fruits: { mean: 0.634426, std: 0.481591, beta: -0.034836 },
+  Veggies: { mean: 0.811426, std: 0.391170, beta: -0.007297 },
+  HvyAlcoholConsump: { mean: 0.055730, std: 0.229399, beta: -0.172950 },
+  AnyHealthcare: { mean: 0.951149, std: 0.215556, beta: 0.013940 },
+  NoDocbcCost: { mean: 0.084624, std: 0.278322, beta: 0.013420 },
+  GenHlth: { mean: 2.511836, std: 1.068375, beta: 0.618830 },
+  MentHlth: { mean: 3.189796, std: 7.417595, beta: -0.032294 },
+  PhysHlth: { mean: 4.250818, std: 8.725625, beta: -0.058374 },
+  DiffWalk: { mean: 0.168160, std: 0.374008, beta: 0.037371 },
+  Sex: { mean: 0.441013, std: 0.496508, beta: 0.139168 },
+  Age: { mean: 8.032827, std: 3.051380, beta: 0.457428 },
+  Education: { mean: 5.049925, std: 0.986382, beta: -0.037379 },
+  Income: { mean: 6.050832, std: 2.072656, beta: -0.119336 },
 };
 
-// Intercept of the Logistic Regression model
-const INTERCEPT = -0.925;
+// Modelin gerçek intercept (kesim noktası) sabiti
+const INTERCEPT = -0.659673;
 
 /**
- * Predicts diabetes risk and returns structured feedback and explanation.
+ * Diyabet riskini tarayıcı tarafında hesaplar ve risk faktörlerini listeler.
  */
 export function predictDiabetes(features: DiabetesFeatures): PredictionResult {
   let z = INTERCEPT;
   const contributions: Contribution[] = [];
 
-  // Loop through features, calculate scaled value, add to dot product z
   (Object.keys(MODEL_STATS) as Array<keyof DiabetesFeatures>).forEach((key) => {
     const value = features[key];
     const { mean, std, beta } = MODEL_STATS[key];
@@ -62,26 +60,26 @@ export function predictDiabetes(features: DiabetesFeatures): PredictionResult {
     });
   });
 
-  // Calculate Sigmoid Probability
+  // Sigmoid Olasılık Fonksiyonu
   const probability = 1 / (1 + Math.exp(-z));
   const prediction = probability >= 0.5 ? 1 : 0;
 
-  // Determine risk category
+  // Risk Seviyesi Belirleme
   let risk_level = 'Düşük Risk';
-  let risk_color = '#10B981'; // Green (Emerald)
+  let risk_color = '#10B981'; // Yeşil
 
   if (probability < 0.35) {
     risk_level = 'Düşük Risk';
     risk_color = '#10B981';
   } else if (probability < 0.60) {
     risk_level = 'Orta Risk';
-    risk_color = '#F59E0B'; // Orange (Amber)
+    risk_color = '#F59E0B'; // Turuncu
   } else {
     risk_level = 'Yüksek Risk';
-    risk_color = '#EF4444'; // Red (Rose)
+    risk_color = '#EF4444'; // Kırmızı
   }
 
-  // Sort contributions by their absolute impact (descending order)
+  // Katkıları mutlak değere göre büyükten küçüğe sırala
   const sortedContributions = contributions.sort(
     (a, b) => Math.abs(b.contribution) - Math.abs(a.contribution)
   );

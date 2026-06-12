@@ -112,11 +112,11 @@ export const FEATURE_METADATA: Record<keyof DiabetesFeatures, { label: string; d
   },
   MentHlth: {
     label: 'Ruh Sağlığı Şikayeti',
-    desc: 'Son 30 günün kaç gününde depresyon, stres veya ruhsal sıkıntı yaşandığı (0-30).',
+    desc: 'Son 30 günün kaç gününde depresyon, stres veya ruhsal sıkıntı yaşandı (0-30).',
   },
   PhysHlth: {
     label: 'Fiziksel Sağlık Şikayeti',
-    desc: 'Son 30 günün kaç gününde hastalık, ağrı veya yaralanma yaşandığı (0-30).',
+    desc: 'Son 30 günün kaç gününde hastalık, ağrı veya yaralanma yaşandı (0-30).',
   },
   DiffWalk: {
     label: 'Yürüme/Merdiven Zorluğu',
@@ -132,7 +132,7 @@ export const FEATURE_METADATA: Record<keyof DiabetesFeatures, { label: string; d
   },
   Education: {
     label: 'Eğitim Seviyesi',
-    desc: 'Bireyin aldığı en yüksek eğitim derecesi (Okuma-yazma yok ile Üniversite arası).',
+    desc: 'Bireyin aldığı en yüksek eğitim derecesi (Okuma-yazma yok ile üniversite mezuniyeti arası).',
   },
   Income: {
     label: 'Yıllık Hane Geliri',
