@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   HeartPulse,
@@ -24,49 +24,23 @@ import {
   Shield,
   Coins,
   GraduationCap,
+  Languages,
+  Sun,
+  Moon,
+  Printer,
+  Sparkles,
 } from 'lucide-react';
 
-import { DiabetesFeatures, FEATURE_METADATA } from './types';
+import { DiabetesFeatures } from './types';
 import { predictDiabetes } from './utils/model';
-
-// Select options lists mapped with localized descriptions
-const AGE_GROUPS = [
-  { value: 1, label: '18 - 24 yaş' },
-  { value: 2, label: '25 - 29 yaş' },
-  { value: 3, label: '30 - 34 yaş' },
-  { value: 4, label: '35 - 39 yaş' },
-  { value: 5, label: '40 - 44 yaş' },
-  { value: 6, label: '45 - 49 yaş' },
-  { value: 7, label: '50 - 54 yaş' },
-  { value: 8, label: '55 - 59 yaş' },
-  { value: 9, label: '60 - 64 yaş' },
-  { value: 10, label: '65 - 69 yaş' },
-  { value: 11, label: '70 - 74 yaş' },
-  { value: 12, label: '75 - 79 yaş' },
-  { value: 13, label: '80 yaş ve üzeri' },
-];
-
-const EDUCATION_LEVELS = [
-  { value: 1, label: 'Okuma yazması yok veya okulsuz' },
-  { value: 2, label: 'İlkokul mezunu (Grade 1-8)' },
-  { value: 3, label: 'Lise terk öğrencisi (Grade 9-11)' },
-  { value: 4, label: 'Lise Mezunu' },
-  { value: 5, label: 'Önlisans / Üniversite Terk' },
-  { value: 6, label: 'Üniversite veya İleri Derece Mezunu' },
-];
-
-const INCOME_GROUPS = [
-  { value: 1, label: 'Aşırı Düşük Gelir (< 10.000 $ / yıl)' },
-  { value: 2, label: 'Çok Düşük Gelir (10.000 $ - 15.000 $)' },
-  { value: 3, label: 'Düşük Gelir (15.000 $ - 20.000 $)' },
-  { value: 4, label: 'Ortanın Altı Gelir (20.000 $ - 25.000 $)' },
-  { value: 5, label: 'Orta Gelir Seviyesi (25.000 $ - 35.000 $)' },
-  { value: 6, label: 'Ortanın Üzeri Gelir (35.000 $ - 50.000 $)' },
-  { value: 7, label: 'Yüksek Gelir Seviyesi (50.000 $ - 75.000 $)' },
-  { value: 8, label: 'En Üst Gelir Grubu (75.000 $ ve üzeri)' },
-];
+import { TRANSLATIONS, FEATURE_METADATA_LOCALIZED } from './utils/translations';
 
 export default function App() {
+  // Lang & Theme support
+  const [lang, setLang] = useState<'tr' | 'en'>('tr');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [patientName, setPatientName] = useState<string>('');
+
   // Navigation & Form Active Tab
   const [activeTab, setActiveTab] = useState<'predict' | 'dashboard'>('predict');
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -104,6 +78,12 @@ export default function App() {
   // Dynamic Factors breakdown view tab
   const [factorTab, setFactorTab] = useState<'risk' | 'protective'>('risk');
 
+  // What-If Simulation State
+  const [whatIfData, setWhatIfData] = useState<DiabetesFeatures | null>(null);
+
+  // Active translation dictionary
+  const t = useMemo(() => TRANSLATIONS[lang], [lang]);
+
   // BMI Value & Status Calculated dynamically
   const calculatedBMI = useMemo(() => {
     if (height > 0 && weight > 0) {
@@ -114,11 +94,65 @@ export default function App() {
 
   const bmiMeta = useMemo(() => {
     const val = calculatedBMI;
-    if (val < 18.5) return { label: 'Zayıf', color: '#1D4ED8', class: 'bg-blue-50 text-blue-800 border border-blue-200' };
-    if (val < 25.0) return { label: 'Normal Kilolu', color: '#0F5132', class: 'bg-emerald-50 text-emerald-800 border border-emerald-200' };
-    if (val < 30.0) return { label: 'Fazla Kilolu', color: '#B45309', class: 'bg-amber-50 text-amber-800 border border-amber-200' };
-    return { label: 'Obez', color: '#B91C1C', class: 'bg-red-50 text-red-800 border border-red-200' };
-  }, [calculatedBMI]);
+    if (val < 18.5) return { label: t.bmiUnderweight, color: '#1D4ED8', class: 'bg-blue-50 text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800' };
+    if (val < 25.0) return { label: t.bmiNormal, color: '#0F5132', class: 'bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-200 dark:border-emerald-800' };
+    if (val < 30.0) return { label: t.bmiOverweight, color: '#B45309', class: 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800' };
+    return { label: t.bmiObese, color: '#B91C1C', class: 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800' };
+  }, [calculatedBMI, lang, t]);
+
+  // Dynamic options arrays based on selected language
+  const AGE_GROUPS = useMemo(() => [
+    { value: 1, label: lang === 'tr' ? '18 - 24 yaş' : '18 - 24 years' },
+    { value: 2, label: lang === 'tr' ? '25 - 29 yaş' : '25 - 29 years' },
+    { value: 3, label: lang === 'tr' ? '30 - 34 yaş' : '30 - 34 years' },
+    { value: 4, label: lang === 'tr' ? '35 - 39 yaş' : '35 - 39 years' },
+    { value: 5, label: lang === 'tr' ? '40 - 44 yaş' : '40 - 44 years' },
+    { value: 6, label: lang === 'tr' ? '45 - 49 yaş' : '45 - 49 years' },
+    { value: 7, label: lang === 'tr' ? '50 - 54 yaş' : '50 - 54 years' },
+    { value: 8, label: lang === 'tr' ? '55 - 59 yaş' : '55 - 59 years' },
+    { value: 9, label: lang === 'tr' ? '60 - 64 yaş' : '60 - 64 years' },
+    { value: 10, label: lang === 'tr' ? '65 - 69 yaş' : '65 - 69 years' },
+    { value: 11, label: lang === 'tr' ? '70 - 74 yaş' : '70 - 74 years' },
+    { value: 12, label: lang === 'tr' ? '75 - 79 yaş' : '75 - 79 years' },
+    { value: 13, label: lang === 'tr' ? '80 yaş ve üzeri' : '80 years and over' },
+  ], [lang]);
+
+  const EDUCATION_LEVELS = useMemo(() => [
+    { value: 1, label: lang === 'tr' ? 'Okuma yazması yok veya okulsuz' : 'Never attended school or only kindergarten' },
+    { value: 2, label: lang === 'tr' ? 'İlkokul mezunu (Grade 1-8)' : 'Elementary school graduate (Grade 1-8)' },
+    { value: 3, label: lang === 'tr' ? 'Lise terk öğrencisi (Grade 9-11)' : 'Some high school (Grade 9-11)' },
+    { value: 4, label: lang === 'tr' ? 'Lise Mezunu' : 'High school graduate' },
+    { value: 5, label: lang === 'tr' ? 'Önlisans / Üniversite Terk' : 'Some college or technical school' },
+    { value: 6, label: lang === 'tr' ? 'Üniversite veya İleri Derece Mezunu' : 'College graduate' },
+  ], [lang]);
+
+  const INCOME_GROUPS = useMemo(() => [
+    { value: 1, label: lang === 'tr' ? 'Aşırı Düşük Gelir (< 10.000 $ / yıl)' : 'Extremely Low Income (< $10k / year)' },
+    { value: 2, label: lang === 'tr' ? 'Çok Düşük Gelir (10.000 $ - 15.000 $)' : 'Very Low Income ($10k - $15k)' },
+    { value: 3, label: lang === 'tr' ? 'Düşük Gelir (15.000 $ - 20.000 $)' : 'Low Income ($15k - $20k)' },
+    { value: 4, label: lang === 'tr' ? 'Ortanın Altı Gelir (20.000 $ - 25.000 $)' : 'Low-Middle Income ($20k - $25k)' },
+    { value: 5, label: lang === 'tr' ? 'Orta Gelir Seviyesi (25.000 $ - 35.000 $)' : 'Middle Income ($25k - $35k)' },
+    { value: 6, label: lang === 'tr' ? 'Ortanın Üzeri Gelir (35.000 $ - 50.000 $)' : 'Upper-Middle Income ($35k - $50k)' },
+    { value: 7, label: lang === 'tr' ? 'Yüksek Gelir Seviyesi (50.000 $ - 75.000 $)' : 'High Income ($50k - $75k)' },
+    { value: 8, label: lang === 'tr' ? 'En Üst Gelir Grubu (75.000 $ ve üzeri)' : 'Top Income Group ($75k and over)' },
+  ], [lang]);
+
+  // Apply Theme to body
+  useEffect(() => {
+    const bodyClass = document.body.classList;
+    if (theme === 'dark') {
+      bodyClass.add('dark-theme');
+    } else {
+      bodyClass.remove('dark-theme');
+    }
+  }, [theme]);
+
+  // Sync whatIfData when results are shown
+  useEffect(() => {
+    if (showResults) {
+      setWhatIfData({ ...formData, BMI: calculatedBMI });
+    }
+  }, [showResults, formData, calculatedBMI]);
 
   // Handle step value updates
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -138,8 +172,35 @@ export default function App() {
   const analysisResult = useMemo(() => {
     // Inject Computed BMI before calling the predictor
     const submissionData = { ...formData, BMI: calculatedBMI };
-    return predictDiabetes(submissionData);
-  }, [formData, calculatedBMI]);
+    
+    // Inject localized label/desc into predictions
+    const rawResult = predictDiabetes(submissionData);
+    rawResult.contributions = rawResult.contributions.map((c) => {
+      const meta = FEATURE_METADATA_LOCALIZED[lang][c.feature];
+      return {
+        ...c,
+        label: meta?.label || c.feature,
+        desc: meta?.desc || '',
+      };
+    });
+    
+    return rawResult;
+  }, [formData, calculatedBMI, lang]);
+
+  // What-if simulated predictions
+  const whatIfResult = useMemo(() => {
+    if (!whatIfData) return null;
+    const rawResult = predictDiabetes(whatIfData);
+    rawResult.contributions = rawResult.contributions.map((c) => {
+      const meta = FEATURE_METADATA_LOCALIZED[lang][c.feature];
+      return {
+        ...c,
+        label: meta?.label || c.feature,
+        desc: meta?.desc || '',
+      };
+    });
+    return rawResult;
+  }, [whatIfData, lang]);
 
   const progressPct = ((currentStep - 1) / 3) * 100;
 
@@ -147,47 +208,18 @@ export default function App() {
   const personalRecommendations = useMemo(() => {
     const advice: string[] = [];
 
-    if (formData.HighBP === 1) {
-      advice.push(
-        '<strong>Tansiyon Kontrolü:</strong> Teşhis edilmiş yüksek tansiyonunuz bulunuyor. Sodyum tüketiminizi kısıtlayıp ilaçlarınızı hekim tavsiyesine göre aksatmamak diyabet riskini ciddi oranda düşürür.'
-      );
-    }
-    if (formData.HighChol === 1) {
-      advice.push(
-        '<strong>Kolesterol Yönetimi:</strong> Yüksek kolesterol insülin direncini ve vasküler riskleri tetikler. Endüstriyel trans yağlardan kaçınmalı ve lifli yulaf, bakliyat diyetine ağırlık vermelisiniz.'
-      );
-    }
-    if (calculatedBMI >= 30) {
-      advice.push(
-        '<strong>Bilinçli Kilo Yönetimi:</strong> BMI değeriniz obezite aralığında. Toplam vücut kütlenizde yapacağınız yalnızca %5 ila %8 hafifleme dahi insülin duyarlılığınızı geri kazanmanıza muazzam yardım eder.'
-      );
-    } else if (calculatedBMI >= 25) {
-      advice.push(
-        '<strong>Kilo Dengeleme:</strong> BMI değeriniz hafif kilolu sınırında seyrediyor. Karbonhidrat porsiyon kontrolü uygulayarak kilonuzun ilerlemesini sınırlandırmanız akılcı bir koruma tedbiridir.'
-      );
-    }
-    if (formData.PhysActivity === 0) {
-      advice.push(
-        '<strong>Aktif Yaşama Geçiş:</strong> Son 30 günde düzenli egzersiz yapmadığınızı belirttiniz. Haftada 150 dakika orta tempolu yürüyüş veya bisiklet sürmek, kasların glukoz kullanımını uyararak şekeri dengeler.'
-      );
-    }
-    if (formData.Smoker === 1) {
-      advice.push(
-        '<strong>Sigara Tedavisi:</strong> Nikotin hücresel düzeyde insülin reseptör hasarı ile diyabet riskini pekiştirir. Sigara bırakma programlarına katılarak bu majör risk odağını eleyebilirsiniz.'
-      );
-    }
-    if (formData.Fruits === 0 || formData.Veggies === 0) {
-      advice.push(
-        '<strong>Beslenme Optimizasyonu:</strong> Günlük taze sebze ve meyve tüketiminiz düşük seviyede. Lifli gıda ve antioksidanlar bağırsak mikrobiyotasını onararak glisemik dalgalanmaları önler.'
-      );
-    }
+    if (formData.HighBP === 1) advice.push(t.recHighBP);
+    if (formData.HighChol === 1) advice.push(t.recHighChol);
+    if (calculatedBMI >= 30) advice.push(t.recObese);
+    else if (calculatedBMI >= 25) advice.push(t.recOverweight);
+    if (formData.PhysActivity === 0) advice.push(t.recNoPhys);
+    if (formData.Smoker === 1) advice.push(t.recSmoker);
+    if (formData.Fruits === 0 || formData.Veggies === 0) advice.push(t.recNoDiet);
 
-    advice.push(
-      '<strong>Akademik Bilgi Notu:</strong> Bu sistem tıbbi bir danışmanlık alternatifi değildir. Riskiniz yüksek çıksın veya çıkmasın, kesin tanı ve erken teşhis için mutlaka hekim gözetiminde kan ölçüm testi (HbA1c) yaptırınız.'
-    );
+    advice.push(t.recAcademicNote);
 
     return advice.slice(0, 4); // return max 4 top targeted items
-  }, [formData, calculatedBMI]);
+  }, [formData, calculatedBMI, lang, t]);
 
   // Filter contributions by active factor tab (risk vs protective)
   const filteredContributions = useMemo(() => {
@@ -198,55 +230,93 @@ export default function App() {
 
   return (
     <div className="relative w-full max-w-5xl mx-auto z-10 px-4 py-12">
-      {/* Decorative architectural background lines */}
-      <div className="background-decor">
+      {/* Decorative architectural background lines - hidden in print */}
+      <div className="background-decor print:hidden">
         <div className="circle circle-1"></div>
         <div className="circle circle-2"></div>
         <div className="circle circle-3"></div>
       </div>
 
+      {/* PDF print header - only visible in print mode */}
+      <div className="hidden print:block mb-8 border-b-2 border-black dark:border-white pb-4 text-center">
+        <h1 className="text-xl font-display font-bold uppercase tracking-wider">{t.pdfReportTitle}</h1>
+        <p className="text-xs font-semibold uppercase text-neutral-500 mt-1">{t.pdfReportSub}</p>
+        {patientName && (
+          <p className="text-sm font-bold mt-4">
+            {t.pdfPatientNameLabel} <span className="underline">{patientName}</span>
+          </p>
+        )}
+        <p className="text-[10px] text-neutral-500 mt-1">
+          {t.pdfGeneratedAt} {new Date().toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US')}
+        </p>
+      </div>
+
       <div className="app-container relative">
         {/* Header bar: Balanced, structured, symmetric */}
-        <header className="app-header mb-12 pb-6 flex flex-col md:flex-row justify-between items-stretch md:items-center border-b border-[#1A1A1A]/10 gap-6">
+        <header className="app-header mb-12 pb-6 flex flex-col md:flex-row justify-between items-stretch md:items-center border-b border-black/10 dark:border-white/10 gap-6 print:hidden">
           <div className="logo flex items-center gap-4">
-            <div className="p-3 bg-[#1A1A1A] text-[#F4F4F1] relative">
+            <div className="p-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 relative">
               <HeartPulse id="logo" className="w-6 h-6" />
             </div>
             <div className="logo-text">
-              <h1 className="font-display font-bold text-xl md:text-2xl tracking-[0.15em] uppercase text-[#1A1A1A]">
-                Equilibrium
+              <h1 className="font-display font-bold text-xl md:text-2xl tracking-[0.15em] uppercase text-neutral-900 dark:text-white transition-colors">
+                {t.logoTitle}
               </h1>
-              <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/50 font-bold block mt-1">
-                Diyabet Risk Analizi • IE410 Advanced Computer Programming
+              <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-neutral-400 font-bold block mt-1">
+                {t.logoSub}
               </span>
             </div>
           </div>
 
-          {/* Navigation Controls in architectural tabs style */}
-          <nav className="app-nav flex gap-2">
-            <button
-              id="btn-nav-calc"
-              onClick={() => setActiveTab('predict')}
-              className={`nav-btn font-bold cursor-pointer flex items-center gap-2 px-6 py-3 text-[11px] uppercase tracking-widest transition-all duration-150 rounded-none ${
-                activeTab === 'predict'
-                  ? 'bg-[#1A1A1A] text-[#F4F4F1] border border-[#1A1A1A]'
-                  : 'bg-white border border-[#1A1A1A]/15 text-[#1A1A1A]/60 hover:text-[#1A1A1A] hover:bg-[#F4F4F1]'
-              }`}
-            >
-              <Calculator className="w-3.5 h-3.5" /> Risk Hesaplayıcı
-            </button>
-            <button
-              id="btn-nav-dash"
-              onClick={() => setActiveTab('dashboard')}
-              className={`nav-btn font-bold cursor-pointer flex items-center gap-2 px-6 py-3 text-[11px] uppercase tracking-widest transition-all duration-150 rounded-none ${
-                activeTab === 'dashboard'
-                  ? 'bg-[#1A1A1A] text-[#F4F4F1] border border-[#1A1A1A]'
-                  : 'bg-white border border-[#1A1A1A]/15 text-[#1A1A1A]/60 hover:text-[#1A1A1A] hover:bg-[#F4F4F1]'
-              }`}
-            >
-              <ChartLine className="w-3.5 h-3.5" /> Model Dashboard
-            </button>
-          </nav>
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Theme & Language Controls */}
+            <div className="flex items-center gap-2 border-r border-black/10 dark:border-white/10 pr-4">
+              {/* Language Selector */}
+              <button
+                type="button"
+                onClick={() => setLang(prev => prev === 'tr' ? 'en' : 'tr')}
+                className="lang-toggle p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-black/10 dark:border-white/10 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer text-neutral-600 dark:text-neutral-300"
+              >
+                <Languages className="w-3.5 h-3.5" />
+                <span>{lang === 'tr' ? 'EN' : 'TR'}</span>
+              </button>
+
+              {/* Theme Selector */}
+              <button
+                type="button"
+                onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+                className="theme-toggle p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-black/10 dark:border-white/10 cursor-pointer text-neutral-600 dark:text-neutral-300"
+              >
+                {theme === 'dark' ? <Sun className="w-3.5 h-3.5 text-amber-500" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
+              </button>
+            </div>
+
+            {/* Navigation Controls in architectural tabs style */}
+            <nav className="app-nav flex gap-2">
+              <button
+                id="btn-nav-calc"
+                onClick={() => setActiveTab('predict')}
+                className={`nav-btn font-bold cursor-pointer flex items-center gap-2 px-6 py-3 text-[11px] uppercase tracking-widest transition-all duration-150 rounded-none ${
+                  activeTab === 'predict'
+                    ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border border-neutral-900 dark:border-white'
+                    : 'bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <Calculator className="w-3.5 h-3.5" /> {t.navPredict}
+              </button>
+              <button
+                id="btn-nav-dash"
+                onClick={() => setActiveTab('dashboard')}
+                className={`nav-btn font-bold cursor-pointer flex items-center gap-2 px-6 py-3 text-[11px] uppercase tracking-widest transition-all duration-150 rounded-none ${
+                  activeTab === 'dashboard'
+                    ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border border-neutral-900 dark:border-white'
+                    : 'bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                }`}
+              >
+                <ChartLine className="w-3.5 h-3.5" /> {t.navDashboard}
+              </button>
+            </nav>
+          </div>
         </header>
 
         {/* Main Content Sections */}
@@ -255,21 +325,21 @@ export default function App() {
             <div>
               {/* Form Wizard vs Results display */}
               {!showResults ? (
-                <div className="glass-card p-6 md:p-10 bg-white">
+                <div className="glass-card p-6 md:p-10 bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10">
                   {/* Step Progress Tracks Component */}
                   <div className="form-progress relative flex justify-between items-center mb-12 px-2 md:px-8">
-                    <div className="progress-track absolute top-5 left-10 right-10 h-[2px] bg-[#1A1A1A]/10 -z-10">
+                    <div className="progress-track absolute top-5 left-10 right-10 h-[2px] bg-neutral-900/10 dark:bg-white/10 -z-10">
                       <div
-                        className="progress-fill h-full bg-[#1A1A1A] transition-all duration-300"
+                        className="progress-fill h-full bg-neutral-900 dark:bg-white transition-all duration-300"
                         style={{ width: `${progressPct}%` }}
                       ></div>
                     </div>
 
                     {[
-                      { step: 1, label: 'Demografi' },
-                      { step: 2, label: 'Vücut & Sağlık' },
-                      { step: 3, label: 'Geçmiş' },
-                      { step: 4, label: 'Yaşam Tarzı' },
+                      { step: 1, label: t.step1Label },
+                      { step: 2, label: t.step2Label },
+                      { step: 3, label: t.step3Label },
+                      { step: 4, label: t.step4Label },
                     ].map((item) => (
                       <button
                         key={item.step}
@@ -281,10 +351,10 @@ export default function App() {
                         <div
                           className={`step-num w-10 h-10 flex items-center justify-center font-bold text-xs transition-all duration-200 border rounded-none ${
                             currentStep === item.step
-                              ? 'bg-[#1A1A1A] border-[#1A1A1A] text-[#F4F4F1]'
+                              ? 'bg-neutral-900 dark:bg-white border-neutral-900 dark:border-white text-white dark:text-neutral-900'
                               : currentStep > item.step
-                              ? 'bg-transparent border-[#1A1A1A] text-[#1A1A1A]'
-                              : 'bg-white border-[#1A1A1A]/15 text-neutral-400 group-hover:border-[#1A1A1A]/30'
+                              ? 'bg-transparent border-neutral-900 dark:border-white text-neutral-900 dark:text-white'
+                              : 'bg-white dark:bg-neutral-900 border-black/15 dark:border-white/15 text-neutral-400 group-hover:border-neutral-900 dark:group-hover:border-white'
                           }`}
                         >
                           {item.step}
@@ -292,9 +362,9 @@ export default function App() {
                         <span
                           className={`step-label text-[10px] uppercase tracking-wider font-bold transition-colors duration-200 ${
                             currentStep === item.step
-                              ? 'text-[#1A1A1A]'
+                              ? 'text-neutral-900 dark:text-white'
                               : currentStep > item.step
-                              ? 'text-[#1A1A1A]/80'
+                              ? 'text-neutral-900/80 dark:text-white/80'
                               : 'text-neutral-400'
                           }`}
                         >
@@ -317,23 +387,23 @@ export default function App() {
                           className="form-step-content"
                           id="step-form-demography"
                         >
-                          <div className="step-header mb-8 border-l-2 border-[#1A1A1A] pl-4">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1A1A1A]/40 block mb-1">
-                              Bölüm 01
+                          <div className="step-header mb-8 border-l-2 border-neutral-900 dark:border-white pl-4">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block mb-1">
+                              {lang === 'tr' ? 'Bölüm 01' : 'Section 01'}
                             </span>
-                            <h2 className="font-display font-light text-2xl text-[#1A1A1A] tracking-tight">
-                              Demografik & Sosyal Bilgiler
+                            <h2 className="font-display font-light text-2xl text-neutral-900 dark:text-white tracking-tight">
+                              {t.step1Title}
                             </h2>
-                            <p className="text-xs text-[#1A1A1A]/60 mt-1 max-w-2xl leading-relaxed">
-                              Lütfen yaş grubu, biyolojik cinsiyete bağlı değişkenler ve eğitim/gelir düzeylerinizi belirtin.
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-2xl leading-relaxed">
+                              {t.step1Desc}
                             </p>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Gender selection cards */}
                             <div className="form-group flex flex-col gap-2.5">
-                              <label className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                Biyolojik Cinsiyet
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                {t.labelSex}
                               </label>
                               <div className="gender-selector flex gap-3">
                                 <label className="flex-1 cursor-pointer">
@@ -349,12 +419,12 @@ export default function App() {
                                   <div
                                     className={`gender-card flex items-center justify-center gap-2.5 p-4 rounded-none font-semibold text-xs transition-all duration-150 border ${
                                       formData.Sex === 0
-                                        ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white'
-                                        : 'bg-white border-[#1A1A1A]/15 text-neutral-600 hover:bg-[#F4F4F1] hover:text-[#1A1A1A]'
+                                        ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-900'
+                                        : 'bg-transparent border-black/15 dark:border-white/15 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                                     }`}
                                   >
                                     <Venus className="w-4 h-4 text-emerald-500" />
-                                    <span>Kadın</span>
+                                    <span>{t.sexFemale}</span>
                                   </div>
                                 </label>
                                 <label className="flex-1 cursor-pointer">
@@ -370,12 +440,12 @@ export default function App() {
                                   <div
                                     className={`gender-card flex items-center justify-center gap-2.5 p-4 rounded-none font-semibold text-xs transition-all duration-150 border ${
                                       formData.Sex === 1
-                                        ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white'
-                                        : 'bg-white border-[#1A1A1A]/15 text-neutral-600 hover:bg-[#F4F4F1] hover:text-[#1A1A1A]'
+                                        ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-900'
+                                        : 'bg-transparent border-black/15 dark:border-white/15 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                                     }`}
                                   >
                                     <Mars className="w-4 h-4 text-sky-500" />
-                                    <span>Erkek</span>
+                                    <span>{t.sexMale}</span>
                                   </div>
                                 </label>
                               </div>
@@ -383,8 +453,8 @@ export default function App() {
 
                             {/* Age categories list */}
                             <div className="form-group flex flex-col gap-2.5">
-                              <label htmlFor="age-select" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                Yaş Aralığı
+                              <label htmlFor="age-select" className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                {t.labelAge}
                               </label>
                               <div className="relative">
                                 <select
@@ -392,10 +462,10 @@ export default function App() {
                                   name="Age"
                                   value={formData.Age}
                                   onChange={handleSelectChange}
-                                  className="w-full bg-white border border-[#1A1A1A]/15 rounded-none px-4 py-3.5 text-xs font-medium text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A] hover:bg-[#F4F4F1] transition-all duration-150 appearance-none cursor-pointer"
+                                  className="w-full bg-white dark:bg-neutral-950 border border-black/15 dark:border-white/15 rounded-none px-4 py-3.5 text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-150 appearance-none cursor-pointer"
                                 >
                                   {AGE_GROUPS.map((g) => (
-                                    <option key={g.value} value={g.value} className="bg-white text-[#1A1A1A]">
+                                    <option key={g.value} value={g.value} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white">
                                       {g.label}
                                     </option>
                                   ))}
@@ -408,8 +478,8 @@ export default function App() {
 
                             {/* Education selection */}
                             <div className="form-group flex flex-col gap-2.5">
-                              <label htmlFor="education-select" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                Öğrenim Durumu
+                              <label htmlFor="education-select" className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                {t.labelEducation}
                               </label>
                               <div className="relative">
                                 <select
@@ -417,10 +487,10 @@ export default function App() {
                                   name="Education"
                                   value={formData.Education}
                                   onChange={handleSelectChange}
-                                  className="w-full bg-white border border-[#1A1A1A]/15 rounded-none px-4 py-3.5 text-xs font-medium text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A] hover:bg-[#F4F4F1] transition-all duration-150 appearance-none cursor-pointer"
+                                  className="w-full bg-white dark:bg-neutral-950 border border-black/15 dark:border-white/15 rounded-none px-4 py-3.5 text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-150 appearance-none cursor-pointer"
                                 >
                                   {EDUCATION_LEVELS.map((el) => (
-                                    <option key={el.value} value={el.value} className="bg-white text-[#1A1A1A]">
+                                    <option key={el.value} value={el.value} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white">
                                       {el.label}
                                     </option>
                                   ))}
@@ -433,8 +503,8 @@ export default function App() {
 
                             {/* Annual Hane Geliri */}
                             <div className="form-group flex flex-col gap-2.5">
-                              <label htmlFor="income-select" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                Yıllık Hane Gelir Düzeyi
+                              <label htmlFor="income-select" className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                {t.labelIncome}
                               </label>
                               <div className="relative">
                                 <select
@@ -442,10 +512,10 @@ export default function App() {
                                   name="Income"
                                   value={formData.Income}
                                   onChange={handleSelectChange}
-                                  className="w-full bg-white border border-[#1A1A1A]/15 rounded-none px-4 py-3.5 text-xs font-medium text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A] hover:bg-[#F4F4F1] transition-all duration-150 appearance-none cursor-pointer"
+                                  className="w-full bg-white dark:bg-neutral-950 border border-black/15 dark:border-white/15 rounded-none px-4 py-3.5 text-xs font-medium text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-150 appearance-none cursor-pointer"
                                 >
                                   {INCOME_GROUPS.map((inc) => (
-                                    <option key={inc.value} value={inc.value} className="bg-white text-[#1A1A1A]">
+                                    <option key={inc.value} value={inc.value} className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white">
                                       {inc.label}
                                     </option>
                                   ))}
@@ -469,23 +539,23 @@ export default function App() {
                           className="form-step-content"
                           id="step-form-body"
                         >
-                          <div className="step-header mb-8 border-l-2 border-[#1A1A1A] pl-4">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1A1A1A]/40 block mb-1">
-                              Bölüm 02
+                          <div className="step-header mb-8 border-l-2 border-neutral-900 dark:border-white pl-4">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block mb-1">
+                              {lang === 'tr' ? 'Bölüm 02' : 'Section 02'}
                             </span>
-                            <h2 className="font-display font-light text-2xl text-[#1A1A1A] tracking-tight">
-                              Vücut Ölçüleri & Genel Sağlık
+                            <h2 className="font-display font-light text-2xl text-neutral-900 dark:text-white tracking-tight">
+                              {t.step2Title}
                             </h2>
-                            <p className="text-xs text-[#1A1A1A]/60 mt-1 max-w-2xl leading-relaxed">
-                              Biyolojik kütlenizi ve kişisel sağlık durumunuzu belirleyin.
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-2xl leading-relaxed">
+                              {t.step2Desc}
                             </p>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Height & Weight Inputs */}
                             <div className="form-group flex flex-col gap-2.5">
-                              <label className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                Boy & Kilo (BMI Hesaplayıcı)
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                {t.labelHeightWeight}
                               </label>
                               <div className="grid grid-cols-2 gap-4">
                                 <div className="relative flex items-center">
@@ -494,11 +564,17 @@ export default function App() {
                                     id="input-height"
                                     min="100"
                                     max="250"
-                                    value={height}
-                                    onChange={(e) => setHeight(Math.max(100, Math.min(250, parseInt(e.target.value) || 100)))}
-                                    className="w-full bg-white border border-[#1A1A1A]/15 rounded-none px-4 py-3.5 text-xs text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                                    value={height || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setHeight(val === '' ? 0 : parseInt(val) || 0);
+                                    }}
+                                    onBlur={() => {
+                                      setHeight(Math.max(100, Math.min(250, height || 175)));
+                                    }}
+                                    className="w-full bg-white dark:bg-neutral-950 border border-black/15 dark:border-white/15 rounded-none px-4 py-3.5 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white"
                                   />
-                                  <span className="absolute right-4 text-[10px] font-bold text-neutral-400">cm</span>
+                                  <span className="absolute right-4 text-[10px] font-bold text-neutral-400">{t.labelHeight} (cm)</span>
                                 </div>
                                 <div className="relative flex items-center">
                                   <input
@@ -506,22 +582,28 @@ export default function App() {
                                     id="input-weight"
                                     min="30"
                                     max="300"
-                                    value={weight}
-                                    onChange={(e) => setWeight(Math.max(30, Math.min(300, parseInt(e.target.value) || 30)))}
-                                    className="w-full bg-white border border-[#1A1A1A]/15 rounded-none px-4 py-3.5 text-xs text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                                    value={weight || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setWeight(val === '' ? 0 : parseInt(val) || 0);
+                                    }}
+                                    onBlur={() => {
+                                      setWeight(Math.max(30, Math.min(300, weight || 80)));
+                                    }}
+                                    className="w-full bg-white dark:bg-neutral-950 border border-black/15 dark:border-white/15 rounded-none px-4 py-3.5 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white"
                                   />
-                                  <span className="absolute right-4 text-[10px] font-bold text-neutral-400">kg</span>
+                                  <span className="absolute right-4 text-[10px] font-bold text-neutral-400">{t.labelWeight} (kg)</span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Evaluated reactive BMI output */}
                             <div className="form-group flex flex-col gap-2.5">
-                              <label className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                Vücut Kitle İndeksi (BMI)
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                {t.labelBMI}
                               </label>
-                              <div className="w-full bg-[#E8E8E5]/20 border border-[#1A1A1A]/15 rounded-none px-4 py-3.5 flex justify-between items-center bg-transparent">
-                                <span className="text-sm font-bold font-display text-[#1A1A1A]">
+                              <div className="w-full bg-transparent border border-black/15 dark:border-white/15 rounded-none px-4 py-3.5 flex justify-between items-center">
+                                <span className="text-sm font-bold font-display text-neutral-900 dark:text-white">
                                   {calculatedBMI} kg/m²
                                 </span>
                                 <span className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-none ${bmiMeta.class}`}>
@@ -533,19 +615,19 @@ export default function App() {
 
                           {/* Subjective GenHlth selector cards */}
                           <div className="form-group flex flex-col gap-2.5 mt-8">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                              Genel Sağlık Değerlendirmeniz
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                              {t.labelGenHlth}
                             </label>
-                            <p className="text-xs text-[#1A1A1A]/50 mt-1">
-                              Genel sağlık durumunuzu nasıl nitelendirirsiniz (1 En İyi - 5 En Kötü)?
+                            <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+                              {t.descGenHlth}
                             </p>
                             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3">
                               {[
-                                { val: 1, label: 'Mükemmel' },
-                                { val: 2, label: 'Çok İyi' },
-                                { val: 3, label: 'İyi' },
-                                { val: 4, label: 'Orta' },
-                                { val: 5, label: 'Kötü' },
+                                { val: 1, label: t.genHlthExcellent },
+                                { val: 2, label: t.genHlthVeryGood },
+                                { val: 3, label: t.genHlthGood },
+                                { val: 4, label: t.genHlthFair },
+                                { val: 5, label: t.genHlthPoor },
                               ].map((item) => (
                                 <button
                                   key={item.val}
@@ -554,8 +636,8 @@ export default function App() {
                                   onClick={() => updateFeatureNum('GenHlth', item.val)}
                                   className={`p-4 rounded-none border flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-150 ${
                                     formData.GenHlth === item.val
-                                      ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white'
-                                      : 'bg-white border-[#1A1A1A]/15 text-[#1A1A1A]/60 hover:bg-[#F4F4F1] hover:text-[#1A1A1A]'
+                                      ? 'bg-neutral-900 border-neutral-900 text-white dark:bg-white dark:border-white dark:text-neutral-900'
+                                      : 'bg-transparent border-black/15 dark:border-white/15 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                                   }`}
                                 >
                                   <span className="text-base font-bold font-display">{item.val}</span>
@@ -569,15 +651,15 @@ export default function App() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
                             <div className="form-group flex flex-col gap-2.5">
                               <div className="flex justify-between items-center">
-                                <label htmlFor="mental-health-slider" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                  Ruh Sağlığı Şikayeti
+                                <label htmlFor="mental-health-slider" className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                  {t.labelMentHlth}
                                 </label>
-                                <span className="bg-[#1A1A1A] text-white px-2 py-0.5 rounded-none text-[9px] font-bold">
-                                  {formData.MentHlth} Gün
+                                <span className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-2 py-0.5 rounded-none text-[9px] font-bold">
+                                  {formData.MentHlth} {t.unitDays}
                                 </span>
                               </div>
-                              <p className="text-xs text-[#1A1A1A]/50 max-w-sm leading-normal">
-                                Son 30 günün kaç gününde stres, depresyon veya ruhsal düşüş yaşadınız?
+                              <p className="text-xs text-neutral-400 dark:text-neutral-500 max-w-sm leading-normal">
+                                {t.descMentHlth}
                               </p>
                               <input
                                 type="range"
@@ -593,15 +675,15 @@ export default function App() {
 
                             <div className="form-group flex flex-col gap-2.5">
                               <div className="flex justify-between items-center">
-                                <label htmlFor="physical-health-slider" className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/70">
-                                  Fiziksel Sağlık Şikayeti
+                                <label htmlFor="physical-health-slider" className="text-[10px] font-bold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
+                                  {t.labelPhysHlth}
                                 </label>
-                                <span className="bg-[#1A1A1A] text-white px-2 py-0.5 rounded-none text-[9px] font-bold">
-                                  {formData.PhysHlth} Gün
+                                <span className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-2 py-0.5 rounded-none text-[9px] font-bold">
+                                  {formData.PhysHlth} {t.unitDays}
                                 </span>
                               </div>
-                              <p className="text-xs text-[#1A1A1A]/50 max-w-sm leading-normal">
-                                Son 30 günün kaç gününde hastalık, ağrı veya bedensel yaralanma yaşadınız?
+                              <p className="text-xs text-neutral-400 dark:text-neutral-500 max-w-sm leading-normal">
+                                {t.descPhysHlth}
                               </p>
                               <input
                                 type="range"
@@ -628,67 +710,70 @@ export default function App() {
                           className="form-step-content"
                           id="step-form-history"
                         >
-                          <div className="step-header mb-8 border-l-2 border-[#1A1A1A] pl-4">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1A1A1A]/40 block mb-1">
-                              Bölüm 03
+                          <div className="step-header mb-8 border-l-2 border-neutral-900 dark:border-white pl-4">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block mb-1">
+                              {lang === 'tr' ? 'Bölüm 03' : 'Section 03'}
                             </span>
-                            <h2 className="font-display font-light text-2xl text-[#1A1A1A] tracking-tight">
-                              Klinik & Tıbbi Öykü
+                            <h2 className="font-display font-light text-2xl text-neutral-900 dark:text-white tracking-tight">
+                              {t.step3Title}
                             </h2>
-                            <p className="text-xs text-[#1A1A1A]/60 mt-1 max-w-2xl leading-relaxed">
-                              Lütfen resmi tıp kuruluşlarınca konmuş tanı veya vasküler durumlarınızı belirtin.
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-2xl leading-relaxed">
+                              {t.step3Desc}
                             </p>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
-                              { key: 'HighBP', title: 'Yüksek Tansiyon (HighBP)', desc: 'Yüksek tansiyon teşhisi konuldu mu?' },
-                              { key: 'HighChol', title: 'Yüksek Kolesterol (HighChol)', desc: 'Kolesterolünüz yüksek teşhis edildi mi?' },
-                              { key: 'CholCheck', title: 'Kolesterol Kontrolü (CholCheck)', desc: 'Son 5 yıl içinde kolesterol testi yaptırdınız mı?' },
-                              { key: 'Stroke', title: 'Felç Geçmişi (Stroke)', desc: 'Daha önce inme ya da geçici felç yaşadınız mı?' },
-                              { key: 'HeartDiseaseorAttack', title: 'Kalp Rahatsızlığı', desc: 'Kalp krizi veya koroner arter hasarı öyküsü var mı?' },
-                              { key: 'DiffWalk', title: 'Yürüme Güçlüğü (DiffWalk)', desc: 'Merdiven çıkmada veya hareket etmede zorluk var mı?' },
-                            ].map((item) => (
-                              <div
-                                key={item.key}
-                                onClick={() => toggleToggle(item.key as keyof DiabetesFeatures)}
-                                className={`p-4 rounded-none border flex items-center justify-between gap-4 cursor-pointer hover:bg-[#F4F4F1] transition-all duration-150 ${
-                                  formData[item.key as keyof DiabetesFeatures] === 1
-                                    ? 'bg-neutral-100 border-[#1A1A1A] text-[#1A1A1A]'
-                                    : 'bg-white border-[#1A1A1A]/10 text-[#1A1A1A]/80'
-                                }`}
-                                id={`toggle-card-${item.key}`}
-                              >
-                                <div>
-                                  <h3 className="text-xs font-bold uppercase tracking-wider">{item.title}</h3>
-                                  <p className="text-[10px] text-neutral-500 mt-1 leading-normal">{item.desc}</p>
-                                </div>
-                                <div className="relative">
-                                  <input
-                                    type="checkbox"
-                                    checked={formData[item.key as keyof DiabetesFeatures] === 1}
-                                    readOnly
-                                    className="sr-only"
-                                    id={`checkbox-${item.key}`}
-                                  />
-                                  <div
-                                    className={`w-11 h-6 rounded-none transition-colors duration-200 relative ${
-                                      formData[item.key as keyof DiabetesFeatures] === 1
-                                        ? 'bg-[#1A1A1A]'
-                                        : 'bg-neutral-200'
-                                    }`}
-                                  >
+                              { key: 'HighBP' },
+                              { key: 'HighChol' },
+                              { key: 'CholCheck' },
+                              { key: 'Stroke' },
+                              { key: 'HeartDiseaseorAttack' },
+                              { key: 'DiffWalk' },
+                            ].map((item) => {
+                              const meta = FEATURE_METADATA_LOCALIZED[lang][item.key as keyof DiabetesFeatures];
+                              return (
+                                <div
+                                  key={item.key}
+                                  onClick={() => toggleToggle(item.key as keyof DiabetesFeatures)}
+                                  className={`p-4 rounded-none border flex items-center justify-between gap-4 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-150 ${
+                                    formData[item.key as keyof DiabetesFeatures] === 1
+                                      ? 'bg-neutral-100 dark:bg-neutral-800 border-neutral-900 dark:border-white text-neutral-900 dark:text-white'
+                                      : 'bg-white dark:bg-neutral-900 border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400'
+                                  }`}
+                                  id={`toggle-card-${item.key}`}
+                                >
+                                  <div>
+                                    <h3 className="text-xs font-bold uppercase tracking-wider">{meta?.label}</h3>
+                                    <p className="text-[10px] text-neutral-500 mt-1 leading-normal">{meta?.desc}</p>
+                                  </div>
+                                  <div className="relative">
+                                    <input
+                                      type="checkbox"
+                                      checked={formData[item.key as keyof DiabetesFeatures] === 1}
+                                      readOnly
+                                      className="sr-only"
+                                      id={`checkbox-${item.key}`}
+                                    />
                                     <div
-                                      className={`w-4 h-4 rounded-none bg-white transition-all duration-200 absolute top-1 left-1 ${
+                                      className={`w-11 h-6 rounded-none transition-colors duration-200 relative ${
                                         formData[item.key as keyof DiabetesFeatures] === 1
-                                          ? 'translate-x-5'
-                                          : 'translate-x-0'
+                                          ? 'bg-neutral-900 dark:bg-white'
+                                          : 'bg-neutral-200 dark:bg-neutral-700'
                                       }`}
-                                    ></div>
+                                    >
+                                      <div
+                                        className={`w-4 h-4 rounded-none bg-white dark:bg-neutral-900 transition-all duration-200 absolute top-1 left-1 ${
+                                          formData[item.key as keyof DiabetesFeatures] === 1
+                                            ? 'translate-x-5'
+                                            : 'translate-x-0'
+                                        }`}
+                                      ></div>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </motion.div>
                       )}
@@ -703,68 +788,71 @@ export default function App() {
                           className="form-step-content"
                           id="step-form-lifestyle"
                         >
-                          <div className="step-header mb-8 border-l-2 border-[#1A1A1A] pl-4">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1A1A1A]/40 block mb-1">
-                              Bölüm 04
+                          <div className="step-header mb-8 border-l-2 border-neutral-900 dark:border-white pl-4">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block mb-1">
+                              {lang === 'tr' ? 'Bölüm 04' : 'Section 04'}
                             </span>
-                            <h2 className="font-display font-light text-2xl text-[#1A1A1A] tracking-tight">
-                              Yaşam Tarzı & Alışkanlıklar
+                            <h2 className="font-display font-light text-2xl text-neutral-900 dark:text-white tracking-tight">
+                              {t.step4Title}
                             </h2>
-                            <p className="text-xs text-[#1A1A1A]/60 mt-1 max-w-2xl leading-relaxed">
-                              Günlük rasyon, egzersiz döngünüz ve temel sağlık sistemi ilişkileriniz.
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-2xl leading-relaxed">
+                              {t.step4Desc}
                             </p>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
-                              { key: 'Smoker', title: 'Sigara Tüketimi (Smoker)', desc: 'Hayatınızda toplam en az 100 adet sigara içtiniz mi?' },
-                              { key: 'PhysActivity', title: 'Aktif Egzersiz', desc: 'Son 30 günde düzenli egzersiz veya spor yaptınız mı?' },
-                              { key: 'Fruits', title: 'Meyve Tüketimi', desc: 'Günde en az bir kez taze meyve tüketiyor musunuz?' },
-                              { key: 'Veggies', title: 'Sebze Tüketimi', desc: 'Günde en az bir kez sebze yemekleri yiyor musunuz?' },
-                              { key: 'HvyAlcoholConsump', title: 'Ölçüsüz Alkol Tüketimi', desc: 'Haftalık olarak erkekler için >14, kadınlar için >8 kadeh?' },
-                              { key: 'AnyHealthcare', title: 'Sağlık Güvencesi', desc: 'Herhangi bir kamu (SGK/Yeşil Kart vb.) veya özel sağlık güvenceniz var mı?' },
-                              { key: 'NoDocbcCost', title: 'Maddi Erişilebilirlik Sorunu', desc: 'Pahalı geldiği için gidemediğiniz veya aksattığınız bir vizite oldu mu?' },
-                            ].map((item) => (
-                              <div
-                                key={item.key}
-                                onClick={() => toggleToggle(item.key as keyof DiabetesFeatures)}
-                                className={`p-4 rounded-none border flex items-center justify-between gap-4 cursor-pointer hover:bg-[#F4F4F1] transition-all duration-150 ${
-                                  formData[item.key as keyof DiabetesFeatures] === 1
-                                    ? 'bg-neutral-100 border-[#1A1A1A] text-[#1A1A1A]'
-                                    : 'bg-white border-[#1A1A1A]/10 text-[#1A1A1A]/80'
-                                }`}
-                                id={`toggle-card-${item.key}`}
-                              >
-                                <div>
-                                  <h3 className="text-xs font-bold uppercase tracking-wider">{item.title}</h3>
-                                  <p className="text-[10px] text-neutral-500 mt-1 leading-normal">{item.desc}</p>
-                                </div>
-                                <div className="relative">
-                                  <input
-                                    type="checkbox"
-                                    checked={formData[item.key as keyof DiabetesFeatures] === 1}
-                                    readOnly
-                                    className="sr-only"
-                                    id={`checkbox-${item.key}`}
-                                  />
-                                  <div
-                                    className={`w-11 h-6 rounded-none transition-colors duration-200 relative ${
-                                      formData[item.key as keyof DiabetesFeatures] === 1
-                                        ? 'bg-[#1A1A1A]'
-                                        : 'bg-neutral-200'
-                                    }`}
-                                  >
+                              { key: 'Smoker' },
+                              { key: 'PhysActivity' },
+                              { key: 'Fruits' },
+                              { key: 'Veggies' },
+                              { key: 'HvyAlcoholConsump' },
+                              { key: 'AnyHealthcare' },
+                              { key: 'NoDocbcCost' },
+                            ].map((item) => {
+                              const meta = FEATURE_METADATA_LOCALIZED[lang][item.key as keyof DiabetesFeatures];
+                              return (
+                                <div
+                                  key={item.key}
+                                  onClick={() => toggleToggle(item.key as keyof DiabetesFeatures)}
+                                  className={`p-4 rounded-none border flex items-center justify-between gap-4 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-150 ${
+                                    formData[item.key as keyof DiabetesFeatures] === 1
+                                      ? 'bg-neutral-100 dark:bg-neutral-800 border-neutral-900 dark:border-white text-neutral-900 dark:text-white'
+                                      : 'bg-white dark:bg-neutral-900 border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400'
+                                  }`}
+                                  id={`toggle-card-${item.key}`}
+                                >
+                                  <div>
+                                    <h3 className="text-xs font-bold uppercase tracking-wider">{meta?.label}</h3>
+                                    <p className="text-[10px] text-neutral-500 mt-1 leading-normal">{meta?.desc}</p>
+                                  </div>
+                                  <div className="relative">
+                                    <input
+                                      type="checkbox"
+                                      checked={formData[item.key as keyof DiabetesFeatures] === 1}
+                                      readOnly
+                                      className="sr-only"
+                                      id={`checkbox-${item.key}`}
+                                    />
                                     <div
-                                      className={`w-4 h-4 rounded-none bg-white transition-all duration-200 absolute top-1 left-1 ${
+                                      className={`w-11 h-6 rounded-none transition-colors duration-200 relative ${
                                         formData[item.key as keyof DiabetesFeatures] === 1
-                                          ? 'translate-x-5'
-                                          : 'translate-x-0'
+                                          ? 'bg-neutral-900 dark:bg-white'
+                                          : 'bg-neutral-200 dark:bg-neutral-700'
                                       }`}
-                                    ></div>
+                                    >
+                                      <div
+                                        className={`w-4 h-4 rounded-none bg-white dark:bg-neutral-900 transition-all duration-200 absolute top-1 left-1 ${
+                                          formData[item.key as keyof DiabetesFeatures] === 1
+                                            ? 'translate-x-5'
+                                            : 'translate-x-0'
+                                        }`}
+                                      ></div>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </motion.div>
                       )}
@@ -772,15 +860,15 @@ export default function App() {
                   </div>
 
                   {/* Form Step Buttons in a flat symmetric line */}
-                  <div className="form-actions flex justify-between items-center mt-12 pt-6 border-t border-[#1A1A1A]/10">
+                  <div className="form-actions flex justify-between items-center mt-12 pt-6 border-t border-black/10 dark:border-white/10">
                     <button
                       type="button"
                       id="btn-prev-step"
                       disabled={currentStep === 1}
                       onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
-                      className="cursor-pointer border border-[#1A1A1A] text-[#1A1A1A] px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-[#1A1A1A] hover:text-white transition-all duration-150 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#1A1A1A] flex items-center gap-1.5 rounded-none"
+                      className="cursor-pointer border border-neutral-900 dark:border-white text-neutral-900 dark:text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-900 hover:text-white dark:hover:bg-white dark:hover:text-neutral-900 transition-all duration-150 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-neutral-900 dark:disabled:hover:text-white flex items-center gap-1.5 rounded-none"
                     >
-                      <ChevronLeft className="w-4 h-4" /> Geri
+                      <ChevronLeft className="w-4 h-4" /> {t.btnPrev}
                     </button>
 
                     {currentStep < 4 ? (
@@ -788,33 +876,33 @@ export default function App() {
                         type="button"
                         id="btn-next-step"
                         onClick={() => setCurrentStep((prev) => Math.min(4, prev + 1))}
-                        className="cursor-pointer border border-[#1A1A1A] bg-[#1A1A1A] text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all duration-150 flex items-center gap-1.5 rounded-none"
+                        className="cursor-pointer border border-neutral-900 dark:border-white bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-150 flex items-center gap-1.5 rounded-none"
                       >
-                        İleri <ChevronRight className="w-4 h-4" />
+                        {t.btnNext} <ChevronRight className="w-4 h-4" />
                       </button>
                     ) : (
                       <button
                         type="button"
                         id="btn-submit-calc"
                         onClick={() => setShowResults(true)}
-                        className="cursor-pointer border border-[#1A1A1A] bg-[#1A1A1A] text-white px-7 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all duration-150 flex items-center gap-1.5 rounded-none"
+                        className="cursor-pointer border border-neutral-900 dark:border-white bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-7 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-150 flex items-center gap-1.5 rounded-none"
                       >
-                        <HeartPulse className="w-4 h-4 text-rose-500" /> Analiz Raporunu Al
+                        <HeartPulse className="w-4 h-4 text-rose-500" /> {t.btnSubmit}
                       </button>
                     )}
                   </div>
                 </div>
               ) : (
                 /* Symmetric Dynamic Interactive Results Interface */
-                <div id="results-panel-container" className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                <div id="results-panel-container" className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start animate-fade-in">
                   
                   {/* Gauge Display Card Left */}
-                  <div className="glass-card p-6 md:p-8 flex flex-col items-center justify-center text-center md:col-span-5 relative bg-white">
+                  <div className="glass-card p-6 md:p-8 flex flex-col items-center justify-center text-center md:col-span-5 relative bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10">
                     <div className="result-header mb-8">
-                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1A1A1A]/40 block mb-1">
-                        Hesaplama Özeti
+                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block mb-1">
+                        {t.resultHeader}
                       </span>
-                      <h2 className="font-display font-light text-xl text-[#1A1A1A] tracking-tight">Eğilim Analiz Göstergesi</h2>
+                      <h2 className="font-display font-light text-xl text-neutral-900 dark:text-white tracking-tight">{t.gaugeTitle}</h2>
                     </div>
 
                     {/* Circular gauge drawing */}
@@ -829,46 +917,34 @@ export default function App() {
                           className="gauge-value"
                           style={{
                             strokeDashoffset: 502 - analysisResult.probability * 502,
-                            stroke: '#1A1A1A',
                           }}
                         />
                       </svg>
                       <div className="gauge-text-container absolute inset-0 flex flex-col justify-center items-center">
-                        <span className="gauge-percentage font-display text-4xl font-extrabold text-[#1A1A1A]">
+                        <span className="gauge-percentage font-display text-4xl font-extrabold text-neutral-900 dark:text-white">
                           {Math.round(analysisResult.probability * 100)}%
                         </span>
-                        <span className="gauge-label text-[8px] font-bold tracking-[0.2em] text-[#1A1A1A]/50 uppercase mt-1">
-                          Risk Olasılığı
+                        <span className="gauge-label text-[8px] font-bold tracking-[0.2em] text-neutral-400 uppercase mt-1">
+                          {t.gaugeLabel}
                         </span>
                       </div>
                     </div>
 
                     <div className="risk-badge-wrapper mb-6">
                       <span
-                        className="risk-level-badge text-[10px] font-bold uppercase tracking-widest px-5 py-2 rounded-none border"
-                        style={{
-                          borderColor: '#1A1A1A',
-                          color: '#FFFFFF',
-                          backgroundColor: '#1A1A1A',
-                        }}
+                        className="risk-level-badge text-[10px] font-bold uppercase tracking-widest px-5 py-2 rounded-none border border-neutral-900 dark:border-white bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
                       >
-                        {analysisResult.risk_level}
+                        {analysisResult.risk_level === 'Düşük Risk' ? t.riskLow : analysisResult.risk_level === 'Orta Risk' ? t.riskMedium : t.riskHigh}
                       </span>
                     </div>
 
-                    <p className="risk-explanation text-xs text-[#1A1A1A]/70 leading-relaxed max-w-sm mb-8">
+                    <p className="risk-explanation text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-sm mb-8">
                       {analysisResult.risk_level === 'Düşük Risk' ? (
-                        <>
-                          Biyometrik modelleriniz, diyabet risk profilinizi <strong>güvenli / düşük</strong> seviyede görmektedir. Mevcut sağlıklı döngünüzü koruyun.
-                        </>
+                        <>{t.explanationLow}</>
                       ) : analysisResult.risk_level === 'Orta Risk' ? (
-                        <>
-                          Modelimiz, diyabet eşiğinizi <strong>orta dereceli risk</strong> grubunda görmektedir. Tıbbi ve metabolik dinamiklerinizde optimize edilebilecek alanlar bulunuyor.
-                        </>
+                        <>{t.explanationMedium}</>
                       ) : (
-                        <>
-                          Dikkat: Algoritma profili, <strong>yüksek diyabet yatkınlığı</strong> tespit etti. Glisemik dengenizi netleştirmek üzere bir uzman hekim kontrolü talep edebilirsiniz.
-                        </>
+                        <>{t.explanationHigh}</>
                       )}
                     </p>
 
@@ -879,40 +955,40 @@ export default function App() {
                         setShowResults(false);
                         setCurrentStep(1);
                       }}
-                      className="cursor-pointer border border-[#1A1A1A] text-[#1A1A1A] px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-[#1A1A1A] hover:text-white transition-all duration-150 rounded-none w-full"
+                      className="cursor-pointer border border-neutral-900 dark:border-white text-neutral-900 dark:text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-900 hover:text-white dark:hover:bg-white dark:hover:text-neutral-900 transition-all duration-150 rounded-none w-full"
                     >
-                      <RotateCcw className="w-3.5 h-3.5 inline mr-1" /> Yeniden Hesapla
+                      <RotateCcw className="w-3.5 h-3.5 inline mr-1" /> {t.btnRestart}
                     </button>
                   </div>
 
                   {/* Contributions & Personal Recommendations Right */}
-                  <div className="glass-card p-6 md:p-8 md:col-span-7 flex flex-col bg-white">
-                    <div className="step-header mb-6 border-l-2 border-[#1A1A1A] pl-4">
-                      <h2 className="font-display font-medium text-lg text-[#1A1A1A] tracking-tight">Bireysel Karar Özellikleri</h2>
-                      <p className="text-xs text-[#1A1A1A]/60 mt-1">Özniteliklerin risk katsayılarına göre bireysel ağırlık dağılımı</p>
+                  <div className="glass-card p-6 md:p-8 md:col-span-7 flex flex-col bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10">
+                    <div className="step-header mb-6 border-l-2 border-neutral-900 dark:border-white pl-4">
+                      <h2 className="font-display font-medium text-lg text-neutral-900 dark:text-white tracking-tight">{t.contributionsTitle}</h2>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{t.contributionsSub}</p>
                     </div>
 
                     {/* Factor selection tabs in architect flat look */}
-                    <div className="factor-tabs flex border border-[#1A1A1A]/10 p-1 rounded-none mb-6 self-start bg-[#F4F4F1]">
+                    <div className="factor-tabs flex border border-black/10 dark:border-white/10 p-1 rounded-none mb-6 self-start bg-neutral-100 dark:bg-neutral-800">
                       <button
                         type="button"
                         id="btn-factors-risk"
                         onClick={() => setFactorTab('risk')}
                         className={`factor-tab text-[9px] font-bold uppercase tracking-widest px-4 py-2.5 rounded-none cursor-pointer flex items-center gap-1.5 transition-all duration-150 ${
-                          factorTab === 'risk' ? 'bg-[#1A1A1A] text-white' : 'text-neutral-500 hover:text-[#1A1A1A]'
+                          factorTab === 'risk' ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900' : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
                         }`}
                       >
-                        <AlertTriangle className="w-3.5 h-3.5 text-brand-rose" /> Risk Artıranlar
+                        <AlertTriangle className="w-3.5 h-3.5 text-brand-rose" /> {t.tabRisk}
                       </button>
                       <button
                         type="button"
                         id="btn-factors-protective"
                         onClick={() => setFactorTab('protective')}
                         className={`factor-tab text-[9px] font-bold uppercase tracking-widest px-4 py-2.5 rounded-none cursor-pointer flex items-center gap-1.5 transition-all duration-150 ${
-                          factorTab === 'protective' ? 'bg-[#1A1A1A] text-white' : 'text-neutral-500 hover:text-[#1A1A1A]'
+                          factorTab === 'protective' ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900' : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
                         }`}
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-emerald" /> Koruyucu Faktörler
+                        <CheckCircle2 className="w-3.5 h-3.5 text-brand-emerald" /> {t.tabProtective}
                       </button>
                     </div>
 
@@ -920,7 +996,7 @@ export default function App() {
                     <div className="factors-list custom-scrollbar max-h-68 overflow-y-auto flex flex-col gap-3 pr-2 mb-6">
                       {filteredContributions.items.length === 0 ? (
                         <p className="text-xs text-neutral-400 italic text-center py-6">
-                          Bu kategoride belirleyici bir faktör saptanmadı.
+                          {t.noFactors}
                         </p>
                       ) : (
                         filteredContributions.items.map((f) => {
@@ -928,41 +1004,43 @@ export default function App() {
 
                           let labelText = '';
                           if (f.feature === 'BMI') labelText = `${f.value} kg/m²`;
-                          else if (f.feature === 'MentHlth' || f.feature === 'PhysHlth') labelText = `${f.value} gün`;
+                          else if (f.feature === 'MentHlth' || f.feature === 'PhysHlth') labelText = `${f.value} ${t.unitDays.toLowerCase()}`;
                           else if (f.feature === 'Age') labelText = AGE_GROUPS.find((ag) => ag.value === f.value)?.label || `${f.value}`;
+                          else if (f.feature === 'Education') labelText = EDUCATION_LEVELS.find((el) => el.value === f.value)?.label || `${f.value}`;
+                          else if (f.feature === 'Income') labelText = INCOME_GROUPS.find((ig) => ig.value === f.value)?.label || `${f.value}`;
                           else if (f.feature === 'GenHlth') {
-                            const map: any = { 1: 'Mükemmel', 2: 'Çok İyi', 3: 'İyi', 4: 'Orta', 5: 'Kötü' };
+                            const map: any = { 1: t.genHlthExcellent, 2: t.genHlthVeryGood, 3: t.genHlthGood, 4: t.genHlthFair, 5: t.genHlthPoor };
                             labelText = map[f.value] || `${f.value}`;
-                          } else if (f.feature === 'Sex') labelText = f.value === 1 ? 'Erkek' : 'Kadın';
-                          else labelText = f.value === 1 ? 'Evet' : 'Hayır';
+                          } else if (f.feature === 'Sex') labelText = f.value === 1 ? t.sexMale : t.sexFemale;
+                          else labelText = f.value === 1 ? (lang === 'tr' ? 'Evet' : 'Yes') : (lang === 'tr' ? 'Hayır' : 'No');
 
                           return (
                             <div
                               key={f.feature}
-                              className="factor-item p-3.5 border border-[#1A1A1A]/10 bg-neutral-50/50 flex flex-col gap-2 hover:border-[#1A1A1A]/20 transition-all rounded-none"
+                              className="factor-item p-3.5 border border-black/10 dark:border-white/10 bg-neutral-50/50 dark:bg-neutral-800/10 flex flex-col gap-2 hover:border-black/20 dark:hover:border-white/20 transition-all rounded-none"
                               id={`factor-term-${f.feature}`}
                             >
                               <div className="flex justify-between items-center">
-                                <span className="font-bold text-xs text-[#1A1A1A]">
+                                <span className="font-bold text-xs text-neutral-900 dark:text-white">
                                   {f.label} ({labelText})
                                 </span>
                                 <span
                                   className={`text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none ${
-                                    f.type === 'risk' ? 'bg-red-50 text-brand-rose border border-red-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                    f.type === 'risk' ? 'bg-red-50 dark:bg-red-950/20 text-brand-rose border border-red-200 dark:border-red-900/30' : 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/30'
                                   }`}
                                 >
-                                  {f.type === 'risk' ? 'Pozitif Korelasyon' : 'Negatif Korelasyon'}
+                                  {f.type === 'risk' ? t.posCorr : t.negCorr}
                                 </span>
                               </div>
-                              <div className="factor-bar w-full h-[3px] bg-neutral-200 overflow-hidden rounded-none">
+                              <div className="factor-bar w-full h-[3px] bg-neutral-200 dark:bg-neutral-800 overflow-hidden rounded-none">
                                 <div
                                   className={`h-full transition-all duration-500 ${
-                                    f.type === 'risk' ? 'bg-[#1A1A1A]' : 'bg-[#1D4ED8]'
+                                    f.type === 'risk' ? 'bg-neutral-900 dark:bg-white' : 'bg-[#1D4ED8]'
                                   }`}
                                   style={{ width: `${percentageWidth}%` }}
                                 ></div>
                               </div>
-                              <p className="factor-desc text-[10px] text-neutral-500 leading-normal">{f.desc}</p>
+                              <p className="factor-desc text-[10px] text-neutral-500 dark:text-neutral-400 leading-normal">{f.desc}</p>
                             </div>
                           );
                         })
@@ -970,21 +1048,181 @@ export default function App() {
                     </div>
 
                     {/* Recommended Medical & Lifestyle actions list box */}
-                    <div className="recommendations-box border border-dashed border-[#1A1A1A]/20 bg-[#F4F4F1]/30 p-5 mt-auto rounded-none">
-                      <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1A1A1A] flex items-center gap-1.5 mb-3.5">
-                        <Award className="w-4 h-4 text-[#1A1A1A]" /> Klinik Yaşam Tarzı Tavsiyeleri
+                    <div className="recommendations-box border border-dashed border-black/20 dark:border-white/20 bg-neutral-50 dark:bg-neutral-800/20 p-5 mt-auto rounded-none">
+                      <h3 className="text-[10px] font-bold uppercase tracking-wider text-neutral-950 dark:text-white flex items-center gap-1.5 mb-3.5">
+                        <Award className="w-4 h-4" /> {t.recTitle}
                       </h3>
                       <ul className="space-y-3">
                         {personalRecommendations.map((rec, index) => (
                           <li
                             key={index}
-                            className="text-neutral-600 text-[11px] leading-relaxed relative pl-4 before:content-['□'] before:text-[#1A1A1A] before:absolute before:left-0 before:font-bold before:text-[9px]"
+                            className="text-neutral-600 dark:text-neutral-400 text-[11px] leading-relaxed relative pl-4 before:content-['□'] before:text-neutral-900 dark:before:text-white before:absolute before:left-0 before:font-bold before:text-[9px]"
                             dangerouslySetInnerHTML={{ __html: rec }}
                           />
                         ))}
                       </ul>
                     </div>
                   </div>
+
+                  {/* What-If / Sensitivity Simulator Card */}
+                  {whatIfData && whatIfResult && (
+                    <div id="what-if-panel-container" className="col-span-12 glass-card p-6 md:p-8 bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 mt-8 print:hidden animate-fade-in">
+                      <div className="step-header mb-6 border-l-2 border-neutral-900 dark:border-white pl-4">
+                        <h2 className="font-display font-medium text-lg text-neutral-900 dark:text-white tracking-tight flex items-center gap-2">
+                          <Sparkles className="w-5 h-5 text-amber-500 animate-pulse animate-duration-1000" /> {t.whatIfTitle}
+                        </h2>
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{t.whatIfDesc}</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                        {/* Simulation controls: Sliders and Toggles (col-span-8) */}
+                        <div className="lg:col-span-8 flex flex-col gap-6 justify-between">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                            {t.whatIfInstructions}
+                          </p>
+
+                          {/* Continuous variable: BMI */}
+                          <div className="flex flex-col gap-2">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="font-bold text-neutral-700 dark:text-neutral-300">
+                                {FEATURE_METADATA_LOCALIZED[lang].BMI.label}
+                              </span>
+                              <span className="font-bold px-2 py-0.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900">
+                                {whatIfData.BMI} kg/m²
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="12"
+                              max="60"
+                              step="0.1"
+                              value={whatIfData.BMI}
+                              onChange={(e) => setWhatIfData(prev => prev ? { ...prev, BMI: parseFloat(e.target.value) } : null)}
+                              className="styled-slider w-full"
+                            />
+                          </div>
+
+                          {/* Discrete variables grid */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {[
+                              { key: 'HighBP' },
+                              { key: 'HighChol' },
+                              { key: 'Smoker' },
+                              { key: 'PhysActivity' },
+                              { key: 'Fruits' },
+                              { key: 'Veggies' },
+                            ].map((item) => {
+                              const fKey = item.key as keyof DiabetesFeatures;
+                              const meta = FEATURE_METADATA_LOCALIZED[lang][fKey];
+                              const isActive = whatIfData[fKey] === 1;
+                              
+                              return (
+                                <button
+                                  key={fKey}
+                                  type="button"
+                                  onClick={() => setWhatIfData(prev => prev ? { ...prev, [fKey]: prev[fKey] === 1 ? 0 : 1 } : null)}
+                                  className={`p-3 text-left border flex flex-col justify-between h-20 transition-all cursor-pointer ${
+                                    isActive
+                                      ? 'bg-neutral-900 dark:bg-white border-neutral-900 dark:border-white text-white dark:text-neutral-900'
+                                      : 'bg-transparent border-black/10 dark:border-white/10 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                                  }`}
+                                >
+                                  <span className="text-[10px] font-bold uppercase tracking-wide leading-tight">{meta?.label}</span>
+                                  <span className="text-[9px] font-medium opacity-65">
+                                    {isActive ? (lang === 'tr' ? 'Aktif' : 'Active') : (lang === 'tr' ? 'Pasif' : 'Inactive')}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Comparison Results Card (col-span-4) */}
+                        <div className="lg:col-span-4 p-5 bg-neutral-50 dark:bg-neutral-800/20 border border-black/10 dark:border-white/10 flex flex-col justify-between text-center items-center">
+                          <div className="w-full">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-neutral-400 block mb-4">
+                              {t.whatIfBaseline} vs {t.whatIfSimulated}
+                            </span>
+                            
+                            {/* Side-by-side comparison values */}
+                            <div className="flex justify-around items-center mb-6">
+                              <div className="flex flex-col">
+                                <span className="text-xl font-bold text-neutral-400 line-through">
+                                  {Math.round(analysisResult.probability * 100)}%
+                                </span>
+                                <span className="text-[8px] font-semibold text-neutral-400 uppercase tracking-wider mt-1">
+                                  {lang === 'tr' ? 'Önceki' : 'Before'}
+                                </span>
+                              </div>
+                              
+                              <div className="text-2xl font-bold text-neutral-400">➔</div>
+                              
+                              <div className="flex flex-col">
+                                <span className="text-3xl font-extrabold text-neutral-900 dark:text-white animate-pulse">
+                                  {Math.round(whatIfResult.probability * 100)}%
+                                </span>
+                                <span className="text-[8px] font-bold text-neutral-900 dark:text-white uppercase tracking-wider mt-1">
+                                  {lang === 'tr' ? 'Yeni' : 'New'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Relative improvement calculation */}
+                          {(() => {
+                            const before = analysisResult.probability;
+                            const after = whatIfResult.probability;
+                            const diff = after - before;
+                            
+                            let text = t.whatIfNoImprovement;
+                            let badgeClass = 'bg-neutral-100 text-neutral-800 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700';
+                            
+                            if (diff < -0.005) {
+                              const improvementPct = Math.round((Math.abs(diff) / before) * 100);
+                              text = `-${improvementPct}% ${t.whatIfLowerRisk}`;
+                              badgeClass = 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/30';
+                            } else if (diff > 0.005) {
+                              const increasePct = Math.round((diff / before) * 100);
+                              text = `+${increasePct}% ${t.whatIfHigherRisk}`;
+                              badgeClass = 'bg-red-50 text-red-800 border-red-200 dark:bg-red-950/20 dark:text-red-300 dark:border-red-900/30';
+                            }
+                            
+                            return (
+                              <div className={`w-full py-3 px-4 border rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1 ${badgeClass}`}>
+                                <Activity className="w-4 h-4 animate-spin animate-duration-3000" />
+                                <span>{text}</span>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Print custom PDF report Controls card */}
+                  <div className="print-controls-card glass-card p-6 bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 col-span-12 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 print:hidden">
+                    <div className="flex flex-col gap-1 w-full sm:w-auto">
+                      <label htmlFor="patient-name-input" className="text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                        {t.pdfPatientNameLabel}
+                      </label>
+                      <input
+                        id="patient-name-input"
+                        type="text"
+                        placeholder={t.pdfPatientNamePlaceholder}
+                        value={patientName}
+                        onChange={(e) => setPatientName(e.target.value)}
+                        className="bg-white dark:bg-neutral-950 border border-black/15 dark:border-white/15 rounded-none px-4 py-2 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white w-full sm:w-64"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="cursor-pointer border border-neutral-900 dark:border-white bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-150 flex items-center gap-1.5 rounded-none w-full sm:w-auto justify-center"
+                    >
+                      <Printer className="w-4 h-4" /> {t.pdfPrintBtn}
+                    </button>
+                  </div>
+
                 </div>
               )}
             </div>
@@ -992,41 +1230,41 @@ export default function App() {
             /* Tab: Academic Report Dashboard */
             <div id="academic-dashboard-panel" className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
               {/* Left Column: Academic Stats and Metric summaries */}
-              <div className="glass-card p-6 md:p-8 flex flex-col bg-white rounded-none">
-                <div className="step-header mb-8 border-l-2 border-[#1A1A1A] pl-4">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1A1A1A]/40 block mb-1">
-                    Metrikler
+              <div className="glass-card p-6 md:p-8 flex flex-col bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 rounded-none">
+                <div className="step-header mb-8 border-l-2 border-neutral-900 dark:border-white pl-4">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-400 block mb-1">
+                    {t.dashHeader}
                   </span>
-                  <h2 className="font-display font-semibold text-xl text-[#1A1A1A] tracking-tight">Akademik Model Raporu</h2>
-                  <p className="text-xs text-neutral-500 mt-1 max-w-lg leading-relaxed">
-                    IE410 Advanced Computer Programming kapsamında CDC BRFSS veri kümesiyle eğitilen en dengeli Parametrik Regresyon özellikleri
+                  <h2 className="font-display font-semibold text-xl text-neutral-900 dark:text-white tracking-tight">{t.dashTitle}</h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-lg leading-relaxed">
+                    {t.dashSub}
                   </p>
                 </div>
 
-                <div className="model-badge-large flex items-center gap-3.5 p-4 rounded-none border border-[#1A1A1A]/10 bg-[#F4F4F1]/40 mb-8 select-none">
-                  <Activity className="w-6 h-6 text-[#1A1A1A] flex-shrink-0" />
+                <div className="model-badge-large flex items-center gap-3.5 p-4 rounded-none border border-black/10 dark:border-white/10 bg-neutral-50 dark:bg-neutral-800/40 mb-8 select-none">
+                  <Activity className="w-6 h-6 text-neutral-900 dark:text-white flex-shrink-0" />
                   <div>
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]">Logistic Regression (Balanced)</h3>
-                    <p className="text-[10px] text-neutral-500 mt-0.5">Sınıf kütle ağırlıkları dengelenmiş parametrik olasılık modeli</p>
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-900 dark:text-white">Logistic Regression (Balanced)</h3>
+                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5">{t.dashModelStrategy}</p>
                   </div>
                 </div>
 
                 {/* Grid performance card metrics */}
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {[
-                    { label: 'Test Accuracy', val: '86.4%', width: '86.4%' },
-                    { label: 'Sensitivity (Recall)', val: '76.2%', width: '76.2%' },
-                    { label: 'ROC AUC Skoru', val: '0.8226', width: '82.2%' },
-                    { label: 'F1-Score değeri', val: '0.4430', width: '44.3%' },
+                    { label: lang === 'tr' ? 'Test Doğruluğu (Accuracy)' : 'Test Accuracy', val: '86.4%', width: '86.4%' },
+                    { label: lang === 'tr' ? 'Duyarlılık (Recall)' : 'Sensitivity (Recall)', val: '76.2%', width: '76.2%' },
+                    { label: lang === 'tr' ? 'ROC AUC Skoru' : 'ROC AUC Score', val: '0.8226', width: '82.2%' },
+                    { label: lang === 'tr' ? 'F1-Skoru Değeri' : 'F1-Score Value', val: '0.4430', width: '44.3%' },
                   ].map((m, idx) => (
-                    <div key={idx} className="metric-card p-4 rounded-none bg-neutral-50/50 border border-black/10 flex flex-col">
-                      <span className="font-display font-extrabold text-2xl text-[#1A1A1A] tracking-tight">{m.val}</span>
-                      <span className="text-[9px] text-[#1A1A1A]/60 uppercase font-bold tracking-widest mt-1.5 mb-3">
+                    <div key={idx} className="metric-card p-4 rounded-none bg-neutral-50/50 dark:bg-neutral-800/10 border border-black/10 dark:border-white/10 flex flex-col">
+                      <span className="font-display font-extrabold text-2xl text-neutral-900 dark:text-white tracking-tight">{m.val}</span>
+                      <span className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase font-bold tracking-widest mt-1.5 mb-3">
                         {m.label}
                       </span>
-                      <div className="w-full h-[2px] bg-neutral-200 overflow-hidden">
+                      <div className="w-full h-[2px] bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
                         <div
-                          className="h-full bg-[#1A1A1A]"
+                          className="h-full bg-neutral-900 dark:bg-white"
                           style={{ width: m.width }}
                         ></div>
                       </div>
@@ -1034,80 +1272,74 @@ export default function App() {
                   ))}
                 </div>
 
-                <div className="info-block mt-auto pt-6 border-t border-[#1A1A1A]/10">
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] mb-3">
-                    Analiz Parametreleri & Bilgileri
+                <div className="info-block mt-auto pt-6 border-t border-black/10 dark:border-white/10">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-neutral-900 dark:text-white mb-3">
+                    {t.dashParamsHeader}
                   </h4>
-                  <ul className="space-y-2 text-xs text-neutral-500 leading-relaxed">
+                  <ul className="space-y-2 text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
                     <li className="flex items-start gap-2">
-                      <span className="text-[#1A1A1A] font-bold">•</span>
-                      <span><strong>Model Boyutu:</strong> CDC BRFSS 2015 Anket kümesi (253.680 onaylı veri kaydı)</span>
+                      <span className="text-neutral-900 dark:text-white font-bold">•</span>
+                      <span dangerouslySetInnerHTML={{ __html: t.dashParamSize }} />
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-[#1A1A1A] font-bold">•</span>
-                      <span><strong>Uyum Yaklaşımı:</strong> Popülasyon dengesizliği optimizasyonu için `class_weight='balanced'` entegrasyonu.</span>
+                      <span className="text-neutral-900 dark:text-white font-bold">•</span>
+                      <span dangerouslySetInnerHTML={{ __html: t.dashParamWeight }} />
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-[#1A1A1A] font-bold">•</span>
-                      <span><strong>Segmentasyon Oranı:</strong> %80 Eğitim (202.944 satır), %20 Test (50.736 satır)</span>
+                      <span className="text-neutral-900 dark:text-white font-bold">•</span>
+                      <span dangerouslySetInnerHTML={{ __html: t.dashParamSplit }} />
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-[#1A1A1A] font-bold">•</span>
-                      <span><strong>Doğrulama Metodu:</strong> Stratified 5-Fold grid arama modeliyle hiperparametre seçimi.</span>
+                      <span className="text-neutral-900 dark:text-white font-bold">•</span>
+                      <span dangerouslySetInnerHTML={{ __html: t.dashParamValidation }} />
                     </li>
                   </ul>
                 </div>
               </div>
 
               {/* Right Column: Accuracy Paradox & Global Importance weights */}
-              <div className="glass-card p-6 md:p-8 flex flex-col gap-8 bg-white rounded-none">
+              <div className="glass-card p-6 md:p-8 flex flex-col gap-8 bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 rounded-none">
                 <div>
-                  <div className="step-header mb-4 border-l-2 border-[#1A1A1A] pl-4">
-                    <h2 className="font-display font-semibold text-lg text-[#1A1A1A] tracking-tight">Doğruluk Paradoksu (Accuracy Paradox)</h2>
-                    <p className="text-xs text-neutral-500">Klinik taramalarda neden doğruluk tek başına yanıltıcı bir ölçüttür?</p>
+                  <div className="step-header mb-4 border-l-2 border-neutral-900 dark:border-white pl-4">
+                    <h2 className="font-display font-semibold text-lg text-neutral-900 dark:text-white tracking-tight">{t.paradoxTitle}</h2>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{t.paradoxSub}</p>
                   </div>
 
-                  <div className="paradox-box border-l-2 border-[#1A1A1A] bg-[#F4F4F1] p-5 text-xs leading-relaxed text-[#1A1A1A]/80 rounded-none">
-                    <p>
-                      CDC BRFSS popülasyon taramasında test grubunun <strong>%86.1’i sağlıklı</strong>, yalnızca <strong>%13.9’u diyabet</strong> teşhisi taşır.
-                    </p>
-                    <p className="mt-2 text-neutral-600">
-                      Hiçbir algoritma yazmadan herkese peşinen "Diyabet Değil" diyen bir sistem test verisinde <strong>%86.1 bağıl doğruluk (accuracy)</strong> oranını yakalardı ancak hasta kişilerin hiçbirini tespit edemez (%0 Duyarlılık) ve gerçek teşhis kapasitesini tamamen yitirirdi.
-                    </p>
-                    <p className="mt-2 text-neutral-600">
-                      Geliştirdiğimiz dengeli uyarıcı model, duyarlılık payını varsayılan %15.6 katsayısından <strong>%76.2 seviyesine</strong> çarpıcı biçimde yükselterek, klinik tarama aşamasında hayat kurtaracak duyarlı bir eşiğe uyarlanmıştır.
-                    </p>
+                  <div className="paradox-box border-l-2 border-neutral-900 dark:border-white bg-[#F4F4F1] dark:bg-neutral-800/30 p-5 text-xs leading-relaxed text-neutral-700 dark:text-neutral-300 rounded-none">
+                    <p dangerouslySetInnerHTML={{ __html: t.paradoxP1 }} />
+                    <p className="mt-2" dangerouslySetInnerHTML={{ __html: t.paradoxP2 }} />
+                    <p className="mt-2" dangerouslySetInnerHTML={{ __html: t.paradoxP3 }} />
                   </div>
                 </div>
 
                 {/* Popularity / Feature importance layout */}
                 <div>
-                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] mb-1">
-                    Küresel Risk Katsayıları (Global Coefficient Weights)
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-950 dark:text-white mb-1">
+                    {t.globalCoeffTitle}
                   </h3>
-                  <p className="text-[11px] text-neutral-500 mb-4">
-                    Tüm popülasyonda modelin diyabet olasılığını saptarken baz aldığı en baskın katsayı sütunları
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mb-4">
+                    {t.globalCoeffSub}
                   </p>
 
                   <div className="space-y-4">
                     {[
-                      { index: 1, name: 'Genel Sağlık Değerlendirmesi (GenHlth)', weight: '%25.4', bar: '100%' },
-                      { index: 2, name: 'Teşhis Edilmiş Yüksek Tansiyon (HighBP)', weight: '%22.1', bar: '87%' },
-                      { index: 3, name: 'Vücut Kitle İndeksi (BMI)', weight: '%18.5', bar: '73%' },
-                      { index: 4, name: 'Yaş Grubu Katsayısı (Age)', weight: '%14.6', bar: '57%' },
-                      { index: 5, name: 'Yüksek Kolesterol Teşhisi (HighChol)', weight: '%12.3', bar: '48%' },
+                      { index: 1, name: t.coeff1Name, weight: lang === 'tr' ? '%25.4' : '25.4%', bar: '100%' },
+                      { index: 2, name: t.coeff2Name, weight: lang === 'tr' ? '%22.1' : '22.1%', bar: '87%' },
+                      { index: 3, name: t.coeff3Name, weight: lang === 'tr' ? '%18.5' : '18.5%', bar: '73%' },
+                      { index: 4, name: t.coeff4Name, weight: lang === 'tr' ? '%14.6' : '14.6%', bar: '57%' },
+                      { index: 5, name: t.coeff5Name, weight: lang === 'tr' ? '%12.3' : '12.3%', bar: '48%' },
                     ].map((item) => (
                       <div key={item.index} className="flex gap-4 items-center">
-                        <div className="w-7 h-7 bg-neutral-100 border border-black/10 rounded-none flex items-center justify-center text-xs text-[#1A1A1A] font-extrabold flex-shrink-0">
+                        <div className="w-7 h-7 bg-neutral-100 dark:bg-neutral-800 border border-black/10 dark:border-white/10 rounded-none flex items-center justify-center text-xs text-neutral-900 dark:text-white font-extrabold flex-shrink-0">
                           {item.index}
                         </div>
                         <div className="flex-1 flex flex-col gap-1.5">
                           <div className="flex justify-between items-center text-xs">
-                            <span className="font-semibold text-neutral-700">{item.name}</span>
-                            <span className="font-bold text-[#1A1A1A]">{item.weight}</span>
+                            <span className="font-semibold text-neutral-700 dark:text-neutral-300">{item.name}</span>
+                            <span className="font-bold text-neutral-900 dark:text-white">{item.weight}</span>
                           </div>
-                          <div className="w-full h-[2px] bg-neutral-200 overflow-hidden rounded-none">
-                            <div className="h-full bg-[#1A1A1A]" style={{ width: item.bar }}></div>
+                          <div className="w-full h-[2px] bg-neutral-200 dark:bg-neutral-800 overflow-hidden rounded-none">
+                            <div className="h-full bg-neutral-900 dark:bg-white" style={{ width: item.bar }}></div>
                           </div>
                         </div>
                       </div>
