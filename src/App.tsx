@@ -141,8 +141,10 @@ export default function App() {
   useEffect(() => {
     const bodyClass = document.body.classList;
     if (theme === 'dark') {
+      bodyClass.add('dark');
       bodyClass.add('dark-theme');
     } else {
+      bodyClass.remove('dark');
       bodyClass.remove('dark-theme');
     }
   }, [theme]);
